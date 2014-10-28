@@ -1,3 +1,4 @@
+package mini;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +16,9 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 /** Index all text files under a directory, the directory is at data/txt/
  */
 
-public class IndexFilesNew {
+public class IndexFilesMini {
 
-	private IndexFilesNew() {}
+	private IndexFilesMini() {}
 
 	public static void buildIndex(String indexPath, String docsPath, 
 			HashSet<String> stopwords) {

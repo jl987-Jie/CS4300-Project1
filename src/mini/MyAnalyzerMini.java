@@ -1,3 +1,4 @@
+package mini;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -12,7 +13,7 @@ import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.util.Version;
 
 
-public class MyAnalyzerNew extends StopwordAnalyzerBase {
+public class MyAnalyzerMini extends StopwordAnalyzerBase {
 
 	/** Maximum allowed token length */
 	public static final int DEFAULT_MAX_TOKEN_LENGTH = 10000;
@@ -21,7 +22,7 @@ public class MyAnalyzerNew extends StopwordAnalyzerBase {
 
 
 	/** Builds an analyzer with the given stop words. */
-	public MyAnalyzerNew(CharArraySet stopWords) {
+	public MyAnalyzerMini(CharArraySet stopWords) {
 		super(stopWords);
 	}
 
@@ -56,7 +57,7 @@ public class MyAnalyzerNew extends StopwordAnalyzerBase {
 		return new TokenStreamComponents(src, tok) {
 			@Override
 			protected void setReader(final Reader reader) throws IOException {
-				src.setMaxTokenLength(MyAnalyzerNew.this.maxTokenLength);
+				src.setMaxTokenLength(MyAnalyzerMini.this.maxTokenLength);
 				super.setReader(reader);
 			}
 		};
