@@ -82,3 +82,6 @@ local.properties
 
 # Other junk that's caused me grief in Java/Eclipse
 .recommenders/
+
+# Specific to this project
+/data/index/**
