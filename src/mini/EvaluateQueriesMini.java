@@ -250,7 +250,7 @@ public class EvaluateQueriesMini {
 	 * @return CharArraySet containing stopwords
 	 */
 	private static CharArraySet createStopwordSet(String stopFilename) {
-		CharArraySet stopwordSet = new CharArraySet(0, false);
+		CharArraySet stopwordSet = new CharArraySet(0, true);
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(
 					new File(stopFilename)));
@@ -258,7 +258,6 @@ public class EvaluateQueriesMini {
 			String line;
 			try {
 				while ((line = in.readLine()) != null) {
-					System.out.println(line);
 					stopwordSet.add(line);
 				}
 			} catch(IOException e) {
