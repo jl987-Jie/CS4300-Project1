@@ -10,7 +10,6 @@ import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
-import org.apache.lucene.util.Version;
 
 
 public class MyAnalyzerMini extends StopwordAnalyzerBase {
@@ -49,10 +48,8 @@ public class MyAnalyzerMini extends StopwordAnalyzerBase {
 		src.setMaxTokenLength(maxTokenLength);
 		TokenStream tok = new StandardFilter(src);
 		tok = new LowerCaseFilter(tok);
-
-		// Add additional filters here 
 		tok = new StopFilter(tok, stopwords);
-
+		tok = new PorterStemFilter(tok);
 
 		return new TokenStreamComponents(src, tok) {
 			@Override

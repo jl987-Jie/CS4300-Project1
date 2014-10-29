@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 // import org.apache.lucene.util.Version;
 
 /** Index all text files under a directory, the directory is at data/txt/
@@ -21,7 +22,7 @@ public class IndexFilesMini {
 	private IndexFilesMini() {}
 
 	public static void buildIndex(String indexPath, String docsPath, 
-			HashSet<String> stopwords) {
+			CharArraySet stopwords) {
 	
 		// check whether docsPath is valid
 		if (docsPath == null || docsPath.isEmpty()) {
