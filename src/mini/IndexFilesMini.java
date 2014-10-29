@@ -55,6 +55,8 @@ public class IndexFilesMini {
 		String indexFile = indexPath + indexName;
 		try {
 			System.out.println("Indexing to directory '" + indexPath + "'...");
+			PrintWriter reset = new PrintWriter(indexFile);
+			reset.close();
 			indexDocs(docDir, stopwords, indexFile);
 			Date end = new Date();
 			System.out.println(end.getTime() - start.getTime() + " total milliseconds");
