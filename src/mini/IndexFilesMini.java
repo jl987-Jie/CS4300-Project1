@@ -1,14 +1,17 @@
 package mini;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -30,7 +33,7 @@ public class IndexFilesMini {
 
 	private IndexFilesMini() {}
 
-	public static void buildIndex(String indexPath, String docsPath, 
+	public static void buildIndex(String indexPath, String indexName, String docsPath, 
 			CharArraySet stopwords) {
 	
 		// check whether docsPath is valid
@@ -49,38 +52,46 @@ public class IndexFilesMini {
 		}
 		
 		Date start = new Date();
+		String indexFile = indexPath + indexName;
 		try {
 			System.out.println("Indexing to directory '" + indexPath + "'...");
-			
+			indexDocs(docDir, stopwords, indexFile);
+			Date end = new Date();
+			System.out.println(end.getTime() - start.getTime() + " total milliseconds");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void indexDocs(File file, CharArraySet stopwords) {
+	public static void indexDocs(File file, CharArraySet stopwords, String indexFile) {
 		if (file.canRead()) {
 			if (file.isDirectory()) {
 				String[] files = file.list();
 				if (files != null) {
 					for (int i = 0; i < files.length; i++) {
-						indexDocs(new File(file, files[i]), stopwords);
+						indexDocs(new File(file, files[i]), stopwords, indexFile);
 					}
 				}
 			} else {
 				FileInputStream fis = null;
+
+				String filename = file.toString();
+				String fileID = filename.substring(filename.lastIndexOf('/') + 1, filename.lastIndexOf('.'));
 				
 				try {
 					fis = new FileInputStream(file);
 
 					BufferedReader fileContents = new BufferedReader(new InputStreamReader(fis));
 					TokenStream tokenizedFile = createTokenizer(fileContents, stopwords);
+					HashMap<String, Integer> fileDictionary = createDictionary(tokenizedFile);
+					
+					outputIndex(fileID, fileDictionary, indexFile);
 
 					try {
 						fileContents.close();
 					} catch (IOException e) {
 						System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
 					}
-					// Probably do stuff here
 				} catch (FileNotFoundException e) {
 					System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
 				}
@@ -106,6 +117,12 @@ public class IndexFilesMini {
 			tokenizedFile.reset();
 			while (tokenizedFile.incrementToken()) {
 				String currentToken = tokenText.toString();
+				Integer currTokenCount = tokenizedFileDict.get(currentToken);
+				if (currTokenCount == null) {
+					tokenizedFileDict.put(currentToken, 1);
+				} else {
+					tokenizedFileDict.put(currentToken, currTokenCount.intValue() + 1);
+				}
 			}
 			tokenizedFile.end();
 			tokenizedFile.close();
@@ -116,35 +133,23 @@ public class IndexFilesMini {
 		return tokenizedFileDict;
 	}
 
-	// read file.
-	public static void readFile(String fileName) {
-		BufferedReader br = null;
-		 
+	public static void outputIndex(String doc, HashMap<String, Integer> dict, String outputFile) {
 		try {
- 
-			String sCurrentLine;
- 
-			br = new BufferedReader(new FileReader(fileName));
- 
-			while ((sCurrentLine = br.readLine()) != null) {
-//				Analyzer analyzer = new StandardAnalyzer(...);
-//				List<String> tokenized_string = analyzer.analyze(sCurrentLine);
-				System.out.println(sCurrentLine);
-			}
- 
+			PrintWriter outWriter = new PrintWriter(new BufferedWriter(new FileWriter(outputFile, true)));
+			String currentLine = createLine(doc, dict);
+			outWriter.println(currentLine);
+			outWriter.close();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)br.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
+			System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
 		}
 	}
 	
-	// analyze file
-	
-	// 
+	public static String createLine(String doc, HashMap<String, Integer> dict) {
+		StringBuilder currentLine = new StringBuilder();
+		currentLine.append(doc);
+		currentLine.append(" -> ");
+		currentLine.append(dict.toString());
+		return currentLine.toString();
+	}
 }
 

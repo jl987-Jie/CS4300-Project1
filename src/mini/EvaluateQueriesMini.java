@@ -16,6 +16,7 @@ import org.apache.lucene.analysis.util.CharArraySet;
 
 public class EvaluateQueriesMini {
 	public static void main(String[] args) {
+		
 		String cacmDocsDir = "data/cacm"; // directory containing CACM documents
 		String medDocsDir = "data/med"; // directory containing MED documents
 
@@ -29,29 +30,33 @@ public class EvaluateQueriesMini {
 		String medAnswerFile = "data/med_processed.rel";   // MED relevance judgements file
 		
 		String stopwordFile = "data/stopwords/stopwords_indri.txt"; // Indri stopword file 
+		
+		String indexPath = "data/";
+		String medIndexName = "med_index.txt";
+		String cacmIndexName = "cacm_index.txt";
 
 		int cacmNumResults = 100;
 		int medNumResults = 100;
 
 		CharArraySet stopwords = createStopwordSet(stopwordFile);
-		
-		System.out.println(evaluate(cacmIndexDir, cacmDocsDir, cacmQueryFile,
-				cacmAnswerFile, cacmNumResults, stopwords));
-
-		System.out.println("\n");
-
-		System.out.println(evaluate(medIndexDir, medDocsDir, medQueryFile,
-				medAnswerFile, medNumResults, stopwords));
+	
+//		System.out.println(evaluate(cacmIndexDir, cacmDocsDir, cacmQueryFile,
+//				cacmAnswerFile, cacmNumResults, stopwords));
+//
+//		System.out.println("\n");
+//
+//		System.out.println(evaluate(medIndexDir, medDocsDir, medQueryFile,
+//				medAnswerFile, medNumResults, stopwords));
 		
 		// Evaluation using MAP:
 		// Results: 0.403 and 0.599
-		System.out.println(evaluateMap(cacmIndexDir, cacmDocsDir, cacmQueryFile,
-				cacmAnswerFile, cacmNumResults, stopwords));
+		System.out.println(evaluateMap(indexPath, cacmDocsDir, cacmQueryFile,
+				cacmAnswerFile, cacmNumResults, cacmIndexName, stopwords));
 
 		System.out.println("\n");
 
-		System.out.println(evaluateMap(medIndexDir, medDocsDir, medQueryFile,
-				medAnswerFile, medNumResults, stopwords));
+		System.out.println(evaluateMap(indexPath, medDocsDir, medQueryFile,
+				medAnswerFile, medNumResults, medIndexName, stopwords));
 	}
 
 	/**
@@ -132,34 +137,34 @@ public class EvaluateQueriesMini {
 		return matches / results.size();
 	}
 
-	private static double evaluate(String indexDir, String docsDir,
-			String queryFile, String answerFile, int numResults,
-			CharArraySet stopwords) {
-
-		// Build Index
-		IndexFilesMini.buildIndex(indexDir, docsDir, stopwords);
-
-		// load queries and answer
-		Map<Integer, String> queries = loadQueries(queryFile);
-		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
-
-		// Search and evaluate
-		double sum = 0;
-		for (Integer i : queries.keySet()) {
-			if (i == 1) {
-				List<String> results = SearchFilesMini.searchQuery(indexDir, queries
-						.get(i), numResults, stopwords);
-				System.out.println("Results: " + results);
-				sum += precision(queryAnswers.get(i), results);
-				System.out.printf("\nTopic %d  ", i);
-				System.out.print (results);
-				System.out.println();
-			}
-
-		}
-
-		return sum / queries.size();
-	}
+//	private static double evaluate(String indexDir, String docsDir,
+//			String queryFile, String answerFile, int numResults,
+//			CharArraySet stopwords) {
+//
+//		// Build Index
+//		IndexFilesMini.buildIndex(indexDir, docsDir, stopwords);
+//
+//		// load queries and answer
+//		Map<Integer, String> queries = loadQueries(queryFile);
+//		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
+//
+//		// Search and evaluate
+//		double sum = 0;
+//		for (Integer i : queries.keySet()) {
+//			if (i == 1) {
+//				List<String> results = SearchFilesMini.searchQuery(indexDir, queries
+//						.get(i), numResults, stopwords);
+//				System.out.println("Results: " + results);
+//				sum += precision(queryAnswers.get(i), results);
+//				System.out.printf("\nTopic %d  ", i);
+//				System.out.print (results);
+//				System.out.println();
+//			}
+//
+//		}
+//
+//		return sum / queries.size();
+//	}
 	
 	/**
 	 * *************
@@ -183,24 +188,26 @@ public class EvaluateQueriesMini {
 	 */
 	public static double evaluateMap(String indexDir, String docsDir, 
 			String queryFile, String answerFile, int numResults,
-			CharArraySet stopwords) {
+			String indexName, CharArraySet stopwords) {
 
 		// Build Index
-		IndexFilesMini.buildIndex(indexDir, docsDir, stopwords);
+		IndexFilesMini.buildIndex(indexDir, indexName, docsDir, stopwords);
 
-		// load queries and answer
-		Map<Integer, String> queries = loadQueries(queryFile);
-		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
-
-		// Search and evaluate
-		double sum = 0;
-		for (Integer i : queries.keySet()) {
-			List<String> results = SearchFilesMini.searchQuery(indexDir, queries
-					.get(i), numResults, stopwords);
-			sum += mapPrecision(queryAnswers.get(i), results);
-		}
-		System.out.println(sum + ", " + queries.size());
-		return sum / queries.size();
+//		// load queries and answer
+//		Map<Integer, String> queries = loadQueries(queryFile);
+//		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
+//
+//		// Search and evaluate
+//		double sum = 0;
+//		for (Integer i : queries.keySet()) {
+//			List<String> results = SearchFilesMini.searchQuery(indexDir, queries
+//					.get(i), numResults, stopwords);
+//			sum += mapPrecision(queryAnswers.get(i), results);
+//		}
+//		System.out.println(sum + ", " + queries.size());
+//		return sum / queries.size();
+		
+		return 1.0;
 	}
 	
 	/**
