@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -85,7 +86,7 @@ public class IndexFilesMini {
 
 					BufferedReader fileContents = new BufferedReader(new InputStreamReader(fis));
 					TokenStream tokenizedFile = createTokenizer(fileContents, stopwords);
-					HashMap<String, Integer> fileDictionary = createDictionary(tokenizedFile);
+					TreeMap<String, Integer> fileDictionary = createDictionary(tokenizedFile);
 					
 					outputIndex(fileID, fileDictionary, indexFile);
 
@@ -112,7 +113,7 @@ public class IndexFilesMini {
 		return tok;
 	}
 
-	public static HashMap<String, Integer> createDictionary(TokenStream tokenizedFile) {
+	public static TreeMap<String, Integer> createDictionary(TokenStream tokenizedFile) {
 		HashMap<String, Integer> tokenizedFileDict = new HashMap<String, Integer>();
 		CharTermAttribute tokenText = tokenizedFile.addAttribute(CharTermAttribute.class);
 		try {
@@ -132,10 +133,11 @@ public class IndexFilesMini {
 			System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
 		}
 
-		return tokenizedFileDict;
+		TreeMap<String, Integer> sortedTokenizedFileDict = new TreeMap<String, Integer>(tokenizedFileDict);
+		return sortedTokenizedFileDict;
 	}
 
-	public static void outputIndex(String doc, HashMap<String, Integer> dict, String outputFile) {
+	public static void outputIndex(String doc, TreeMap<String, Integer> dict, String outputFile) {
 		try {
 			PrintWriter outWriter = new PrintWriter(new BufferedWriter(new FileWriter(outputFile, true)));
 			String currentLine = createLine(doc, dict);
@@ -146,7 +148,7 @@ public class IndexFilesMini {
 		}
 	}
 	
-	public static String createLine(String doc, HashMap<String, Integer> dict) {
+	public static String createLine(String doc, TreeMap<String, Integer> dict) {
 		StringBuilder currentLine = new StringBuilder();
 		currentLine.append(doc);
 		currentLine.append(" -> ");
