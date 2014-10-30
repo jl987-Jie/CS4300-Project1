@@ -18,39 +18,38 @@ import org.apache.lucene.analysis.util.CharArraySet;
 
 public class SimilarityMini {
 
-	static HashSet<String> termSet = new HashSet<String>();
 	static String[] termsArray;
+	
+	static HashSet<String> termSet 									= new HashSet<String>();
 	static HashMap<String, HashMap<String, Integer>> docTermFreqMap = new HashMap<String, HashMap<String, Integer>>();
-	static HashMap<String, Integer> invDocFreqMap = new HashMap<String, Integer>();
-	static HashMap<String, Integer> maxTfMap = new HashMap<String, Integer>();
-
+	static HashMap<String, Integer> invDocFreqMap 					= new HashMap<String, Integer>();
+	static HashMap<String, Integer> maxTfMap 						= new HashMap<String, Integer>();
+	static HashMap<Integer, TreeMap<String, Integer>> queryMap 		= new HashMap<Integer, TreeMap<String, Integer>>();
+	static HashMap<String, HashSet<String>> idfMap 					= new HashMap<String, HashSet<String>>();
+	static int totalNumDocs 										= docTermFreqMap.size();
+	static HashMap<Integer, HashMap<String, Double>> queryRelMap 	= new HashMap<Integer, HashMap<String, Double>>();
+	
 	//BM25 constants
 	static final double B = 0.75;
 	static final double K1 = 1.2;
 	static final double K2 = 100.;
 	
-	static int totalNumDocs = docTermFreqMap.size();
-	static HashMap<Integer, HashMap<String, Double>> queryIdRelevanceMap = 
-			new HashMap<Integer, HashMap<String, Double>>();
-
-	// Question 3.
-	public static void main(String[] args) {
-
-		HashMap<String, HashMap<String, Integer>> map 
-			= getTermFrequency(Constants.DATA_DIR + Constants.CACM_IDX); // doc id -> term -> frequency.
-		HashMap<Integer, TreeMap<String, Integer>> queryMap 
-			= loadTokenizedQueries(Constants.CACM_QUERY); // query id -> term -> frequency.
-
-		// need idf.
-		HashMap<String, HashSet<String>> idfMap = getInverseDocFreq(map);
+	public static void init() {
+		
+		docTermFreqMap = getTermFrequency(Constants.DATA_DIR + Constants.CACM_IDX);
+		queryMap = loadTokenizedQueries(Constants.CACM_QUERY);
+		idfMap = getInverseDocFreq(docTermFreqMap);
 
 		// initialize termsArray
 		termsArray = new String[termSet.size()];
 		initializeTermsArray();
 		
 		// initialize maxTfMap
-		maxTfMap(map);
-		
+		maxTfMap(docTermFreqMap);
+	}
+	
+	// Question 3.
+	public static void main(String[] args) {
 		// for each query, we have to calculate the similarity between 
 		// the query and the document (which is determined by the tf-idf score)
 
@@ -103,7 +102,6 @@ public class SimilarityMini {
 						relevanceArray[i] 	= tfScore * idfScore;
 					}
 			}
-
 		}
 		return relevanceArray;
 	}
