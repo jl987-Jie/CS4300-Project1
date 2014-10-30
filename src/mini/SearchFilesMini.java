@@ -29,9 +29,7 @@ public class SearchFilesMini {
 		try {
 			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexDir)));
 			IndexSearcher searcher = new IndexSearcher(reader);
-//			Analyzer analyzer = new MyAnalyzer(Version.LUCENE_44, stopwords);
-//
-//			QueryParser parser = new QueryParser(Version.LUCENE_44, field, analyzer);
+
 			Analyzer analyzer = new MyAnalyzerMini(stopwords);
 
 			QueryParser parser = new QueryParser(field, analyzer);
