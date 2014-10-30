@@ -53,9 +53,10 @@ public class SimilarityMini {
 	public static void main(String[] args) {
 		// for each query, we have to calculate the similarity between 
 		// the query and the document (which is determined by the tf-idf score)
-
+		init();
 		for (Integer queryId : queryMap.keySet()) {
-			double[] result = getRelevance(queryId, idfMap);
+			
+			double[] result = getRelevance(queryId);
 			
 			for (int i = 0; i < result.length; i++) {
 				if (result[i] != 0) {
@@ -67,7 +68,7 @@ public class SimilarityMini {
 
 	}
 
-	// Stores the maxTf into maxTfMap.
+	// Stores the maxTf into maxTfMap for each document.
 	public static void maxTfMap(HashMap<String, HashMap<String, Integer>> map) {
 		for (String docId : map.keySet()) {
 			int maxTf = 0;
@@ -81,7 +82,7 @@ public class SimilarityMini {
 		}
 	}
 
-	public static double[] getRelevance(Integer queryId, HashMap<String, HashSet<String>> idfMap) {
+	public static double[] getRelevance(Integer queryId) {
 
 		double[] relevanceArray = new double[termSet.size()];
 
@@ -327,5 +328,6 @@ public class SimilarityMini {
 		
 		return queryScores;
 	}
+
 
 }
