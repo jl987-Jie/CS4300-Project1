@@ -7,8 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -21,6 +23,12 @@ public class SimilarityMini {
 	static HashMap<String, HashMap<String, Integer>> docTermFreqMap = new HashMap<String, HashMap<String, Integer>>();
 	static HashMap<String, Integer> invDocFreqMap = new HashMap<String, Integer>();
 	static HashMap<String, Integer> maxTfMap = new HashMap<String, Integer>();
+
+	//BM25 constants
+	static final double B = 0.75;
+	static final double K1 = 1.2;
+	static final double K2 = 100.;
+	
 	static int totalNumDocs = docTermFreqMap.size();
 	static HashMap<Integer, HashMap<String, Double>> queryIdRelevanceMap = 
 			new HashMap<Integer, HashMap<String, Double>>();
@@ -226,5 +234,69 @@ public class SimilarityMini {
 		}
 		return map;
 	}
-
+	
+	public static HashMap<String, Integer> calculateDocLengths (HashMap<String, HashMap<String, Integer>> index) {
+		HashMap<String, Integer> docLength = new HashMap<String, Integer>();
+		for (String key : index.keySet()) {
+			HashMap<String, Integer> currDocIndex = index.get(key);
+			int currDocLength = 0;
+			for (String currKey : currDocIndex.keySet()) {
+				int currFreq = currDocIndex.get(currKey);
+				currDocLength += currFreq;
+			}
+			docLength.put(key, currDocLength);
+		}
+		return docLength;
+	}
+	
+	public static double calculateAvgDocLength(HashMap<String, Integer> docLengths) {
+		int totalDocLength = 0;
+		int totalDocAmount = docLengths.size();
+		for (String key : docLengths.keySet()) {
+			int currLength = docLengths.get(key);
+			totalDocLength += currLength;
+		}
+		return (((double) totalDocLength) / ((double) totalDocAmount));
+	}
+	
+	public static HashMap<String, Integer> calculateNumberOfHitsPerTerm(HashMap<String, HashMap<String,Integer>> index, 
+			TreeMap<String, Integer> query) {
+		HashMap<String, Integer> numHits = new HashMap<String, Integer>();
+		for (String key : query.keySet()) {
+			int hits = 0;
+			for (String doc : index.keySet()) {
+				hits += index.get(doc).containsKey(key) ? 1 : 0;
+			}
+			numHits.put(key, hits);
+		}
+		return numHits;
+	}
+	
+//	public static double calculateBM25PerDoc(HashMap<String, Integer> document, 
+//			TreeMap<String, Integer> query, HashMap<String, Integer> numHits,
+//			double docLength, double docCount, double avgDocLength) {
+//		double score = 0;
+//		for (String key : query.keySet()) {
+//			double numHit = (double) numHits.get(key);
+//			double docFreq = (double) document.get(key);
+//			double queryFreq = (double) query.get(key);
+//			double subscore = Math.log((numHit + 0.5) 
+//					/ (docCount - numHit + 0.5));
+//			double K = K1 * ((1-B) + B * (docLength / docCount));
+//			subscore = subscore * (((K1 + 1) * docFreq) / (K + docFreq));
+//			subscore = subscore * (((K2 + 1) * queryFreq) / (K + queryFreq));
+//			score += subscore;
+//		}
+//	}
+//	
+//	public static ArrayList<Double> calculateBM25(HashMap<String, HashMap<String, Integer>> index, 
+//			HashMap<String, Integer> docLengths, double avgDocLengths, 
+//			HashMap<Integer, TreeMap<String, Integer>> tokenizedQueries) {
+//		for (int currQueryKey : tokenizedQueries.keySet()) {
+//			TreeMap<String, Integer> currTokenizedQuery = tokenizedQueries.get(currQueryKey);
+//			for (String doc : index.keySet()) {
+//				
+//			}
+//		}
+//	}
 }
