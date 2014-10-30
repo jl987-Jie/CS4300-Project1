@@ -64,7 +64,7 @@ public class EvaluateQueriesMini {
 	 * @param filename
 	 * @return
 	 */
-	private static Map<Integer, String> loadQueries(String filename) {
+	public static Map<Integer, String> loadQueries(String filename) {
 		HashMap<Integer, String> queryIdMap = new HashMap<Integer, String>();
 		BufferedReader in = null;
 		try {
@@ -256,7 +256,7 @@ public class EvaluateQueriesMini {
 	 * @param results List of retrieved documents by a query
 	 * @return CharArraySet containing stopwords
 	 */
-	private static CharArraySet createStopwordSet(String stopFilename) {
+	public static CharArraySet createStopwordSet(String stopFilename) {
 		CharArraySet stopwordSet = new CharArraySet(0, true);
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(
