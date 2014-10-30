@@ -146,8 +146,9 @@ public class IndexFilesMini {
 	
 	public static String createLine(String doc, HashMap<String, Integer> dict) {
 		StringBuilder currentLine = new StringBuilder();
-		currentLine.append(doc);
-		currentLine.append(" -> ");
+		currentLine.append(doc + ": ");
+//		currentLine.append(" -> ");
+		
 		currentLine.append(dict.toString());
 		return currentLine.toString();
 	}
