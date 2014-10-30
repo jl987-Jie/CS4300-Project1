@@ -12,8 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javafx.util.Pair;
+import java.util.TreeSet;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -292,9 +291,9 @@ public class SimilarityMini {
 		return score;
 	}
 	
-	public static HashSet<Pair<String, Double>> calculateBM25perQuery 
+	public static HashSet<Pair> calculateBM25perQuery 
 		(HashMap<String, HashMap<String, Integer>> index, TreeMap<String, Integer> query) {
-		HashSet<Pair<String, Double>> queryScores = new HashSet<Pair<String, Double>>();
+		HashSet<Pair> queryScores = new HashSet<Pair>();
 		HashMap<String, Integer> numHits = calculateNumberOfHitsPerTerm(index, query);
 		HashMap<String, Integer> docLengths = calculateDocLengths(index);
 		double docCount = (double) docLengths.size();
@@ -304,22 +303,25 @@ public class SimilarityMini {
 			HashMap<String, Integer> document = index.get(docKey);
 			double score = calculateBM25PerDoc(document, query, numHits, 
 					docLength, docCount, avgDocLength);
-			Pair<String, Double> queryScoreOnDoc = new Pair<String, Double>(docKey, score);
+			Pair queryScoreOnDoc = new Pair();
+			queryScoreOnDoc.setId(docKey);
+			queryScoreOnDoc.setVal(score);
 			queryScores.add(queryScoreOnDoc);
 		}
 		
 		return queryScores;
 	}
 	
-	public static HashMap<Integer, HashSet<Pair<String,Double>>> calculateBM25 
+	public static HashMap<Integer, TreeSet<Pair>> calculateBM25 
 		(HashMap<String, HashMap<String, Integer>> index, 
 				HashMap<Integer, TreeMap<String, Integer>> queries) {
-		HashMap<Integer, HashSet<Pair<String,Double>>> queryScores = 
-				new HashMap<Integer, HashSet<Pair<String,Double>>>();
+		HashMap<Integer, TreeSet<Pair>> queryScores = 
+				new HashMap<Integer, TreeSet<Pair>>();
 		for (Integer queryKey : queries.keySet()) {
 			TreeMap<String, Integer> query = queries.get(queryKey);
-			HashSet<Pair<String, Double>> queryScoreSet = 
+			HashSet<Pair> queryScoreSetUnsorted = 
 					calculateBM25perQuery(index, query);
+			TreeSet<Pair> queryScoreSet = new TreeSet<Pair>(queryScoreSetUnsorted);
 			queryScores.put(queryKey, queryScoreSet);
 		}
 		
