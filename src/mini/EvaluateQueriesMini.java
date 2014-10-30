@@ -40,23 +40,51 @@ public class EvaluateQueriesMini {
 
 		CharArraySet stopwords = createStopwordSet(stopwordFile);
 	
-//		System.out.println(evaluate(cacmIndexDir, cacmDocsDir, cacmQueryFile,
-//				cacmAnswerFile, cacmNumResults, stopwords));
+
+//		System.out.println(evaluateMap(indexPath, cacmDocsDir, cacmQueryFile,
+//				cacmAnswerFile, cacmNumResults, cacmIndexName, stopwords));
 //
 //		System.out.println("\n");
 //
-//		System.out.println(evaluate(medIndexDir, medDocsDir, medQueryFile,
-//				medAnswerFile, medNumResults, stopwords));
-		
-		// Evaluation using MAP:
-		// Results: 0.403 and 0.599
-		System.out.println(evaluateMap(indexPath, cacmDocsDir, cacmQueryFile,
-				cacmAnswerFile, cacmNumResults, cacmIndexName, stopwords));
+//		System.out.println(evaluateMap(indexPath, medDocsDir, medQueryFile,
+//				medAnswerFile, medNumResults, medIndexName, stopwords));
 
-		System.out.println("\n");
-
-		System.out.println(evaluateMap(indexPath, medDocsDir, medQueryFile,
-				medAnswerFile, medNumResults, medIndexName, stopwords));
+		int argsPosition = 1;
+		if (args != null && args[0].equals("run")) {
+			while (argsPosition <= (args.length -1)) {
+				switch (args[argsPosition]) {
+				case "-i":
+					String indexing = args[argsPosition + 1];
+					switch (indexing) {
+					case "cacm":
+						IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
+								cacmDocsDir, stopwords);
+						break;
+					case "med":
+						IndexFilesMini.buildIndex(indexPath, medIndexName, 
+								medDocsDir, stopwords);
+						break;
+					case "all":
+						IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
+								cacmDocsDir, stopwords);
+						IndexFilesMini.buildIndex(indexPath, medIndexName, 
+								medDocsDir, stopwords);
+						break;
+					default:
+						System.out.println("Invalid argument supplied to indexer");
+						break;
+					}
+					argsPosition += 2;
+					break;
+				default:
+					System.out.println("Invalid arguments supplied ok?");
+					break;
+				}
+			}
+			System.out.println("Done running.");
+		} else {
+			System.out.println("Invalid arguments supplied");
+		}
 	}
 
 	/**
@@ -188,7 +216,8 @@ public class EvaluateQueriesMini {
 	 */
 	public static double evaluateMap(String indexDir, String docsDir, 
 			String queryFile, String answerFile, int numResults,
-			String indexName, CharArraySet stopwords) {
+			String indexName, CharArraySet stopwords,
+			ArrayList<String> results) {
 
 		// Build Index
 		IndexFilesMini.buildIndex(indexDir, indexName, docsDir, stopwords);
@@ -221,7 +250,7 @@ public class EvaluateQueriesMini {
 	 * @return MAP for a single query.
 	 */
 	public static double mapPrecision(HashSet<String> answers, 
-			List<String> results, double numRelDocs) {
+			ArrayList<String> results, double numRelDocs) {
 
 		double precision			= 0.0;
 		int matchedDocumentCount 	= 0;
