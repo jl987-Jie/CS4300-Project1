@@ -87,7 +87,7 @@ public class EvaluateQueriesMini {
 							System.out.println("Invalid argument supplied to indexer");
 							break;
 						}
-						argsPosition += 2;
+						argsPosition += 1;
 						break;
 					case "-b":
 						String bmNumberStr = args[argsPosition + 1];
@@ -122,7 +122,8 @@ public class EvaluateQueriesMini {
 									"bm25", cacmDocTermIndex, cacmQueryTermIndex);
 							System.out.println("CACM BM25 MAP is " + bmCacmResult
 									+ " for " + bmNumberVal + " documents");
-						} else if (collection.equals("med") || collection.equals("all")) {
+						} 
+						if (collection.equals("med") || collection.equals("all")) {
 							if (medDocTermIndex == null) {
 								medDocTermIndex = SimilarityMini.getTermFrequency(
 										indexPath + medIndexName);
@@ -136,7 +137,9 @@ public class EvaluateQueriesMini {
 									"bm25", medDocTermIndex, medQueryTermIndex);
 							System.out.println("MED BM25 MAP is " + bmMedResult
 									+ "for " + bmNumberVal + " documents");
-						} else {
+						} 
+						if (!(collection.equals("cacm") || collection.equals("med") 
+								|| collection.equals("all"))) {
 							System.out.println("Invalid arguments supplied for bm25");
 							System.out.println(collection);
 							System.out.println(bmNumberVal);
@@ -307,8 +310,11 @@ public class EvaluateQueriesMini {
 			double numRelDocs = (double) queryAnswers.get(i).size();
 			if (similarityMeasure == "bm25") {
 				results = SimilarityMini.extractDocList(bm25results, i);
-				results = new ArrayList<String>(results.subList(0, 
+				try {
+					results = new ArrayList<String>(results.subList(0, 
 						Math.min(numResults, docTermIndex.size() -1)));
+				} catch (IndexOutOfBoundsException e) {
+				}
 			}
 			sum += mapPrecision(queryAnswers.get(i), results, numRelDocs);
 		}
