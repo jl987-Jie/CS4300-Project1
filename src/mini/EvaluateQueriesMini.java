@@ -200,9 +200,10 @@ public class EvaluateQueriesMini {
 //		// Search and evaluate
 //		double sum = 0;
 //		for (Integer i : queries.keySet()) {
+//			double numRelDocs = (double) queryAnswers.get(i).size();
 //			List<String> results = SearchFilesMini.searchQuery(indexDir, queries
 //					.get(i), numResults, stopwords);
-//			sum += mapPrecision(queryAnswers.get(i), results);
+//			sum += mapPrecision(queryAnswers.get(i), results, numRelDocs);
 //		}
 //		System.out.println(sum + ", " + queries.size());
 //		return sum / queries.size();
@@ -220,7 +221,7 @@ public class EvaluateQueriesMini {
 	 * @return MAP for a single query.
 	 */
 	public static double mapPrecision(HashSet<String> answers, 
-			List<String> results) {
+			List<String> results, double numRelDocs) {
 
 		double precision			= 0.0;
 		int matchedDocumentCount 	= 0;
@@ -242,7 +243,7 @@ public class EvaluateQueriesMini {
 			sumPrecisionVal += val;
 		}
 
-		precision = sumPrecisionVal / matchedDocumentCount;
+		precision = sumPrecisionVal / numRelDocs;
 		return precision;
 	}
 	
