@@ -42,7 +42,7 @@ public class EvaluateQueries {
 				medAnswerFile, medNumResults, stopwords));
 		
 		// Evaluation using MAP:
-		// Results: 0.403 and 0.599
+		// Results: 0.2733 and 0.4638
 		System.out.println(evaluateMap(cacmIndexDir, cacmDocsDir, cacmQueryFile,
 				cacmAnswerFile, cacmNumResults, stopwords));
 
@@ -193,9 +193,10 @@ public class EvaluateQueries {
 		// Search and evaluate
 		double sum = 0;
 		for (Integer i : queries.keySet()) {
+			double numRelDocs = (double) queryAnswers.get(i).size();
 			List<String> results = SearchFiles.searchQuery(indexDir, queries
 					.get(i), numResults, stopwords);
-			sum += mapPrecision(queryAnswers.get(i), results);
+			sum += mapPrecision(queryAnswers.get(i), results, numRelDocs);
 		}
 		System.out.println(sum + ", " + queries.size());
 		return sum / queries.size();
@@ -211,7 +212,7 @@ public class EvaluateQueries {
 	 * @return MAP for a single query.
 	 */
 	private static double mapPrecision(HashSet<String> answers, 
-			List<String> results) {
+			List<String> results, double numRelDocs ) {
 
 		double precision			= 0.0;
 		int matchedDocumentCount 	= 0;
@@ -233,7 +234,7 @@ public class EvaluateQueries {
 			sumPrecisionVal += val;
 		}
 
-		precision = sumPrecisionVal / matchedDocumentCount;
+		precision = sumPrecisionVal / numRelDocs;
 		return precision;
 	}
 

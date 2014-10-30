@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -798,9 +799,24 @@ public class SimilarityMini {
 			double docLength, double docCount, double avgDocLength) {
 		double score = 0;
 		for (String key : query.keySet()) {
-			double numHit = (double) numHits.get(key);
-			double docFreq = (double) document.get(key);
-			double queryFreq = (double) query.get(key);
+			double numHit;
+			double docFreq;
+			double queryFreq;
+			try {
+				numHit = (double) numHits.get(key);
+			} catch (NullPointerException e) {
+				numHit = 0.;
+			}
+			try {
+				docFreq = (double) document.get(key);
+			} catch (NullPointerException e) {
+				docFreq = 0.;
+			}
+			try {
+				queryFreq = (double) query.get(key);
+			} catch (NullPointerException e) {
+				queryFreq = 0.;
+			}
 			double subscore = Math.log((numHit + 0.5) 
 					/ (docCount - numHit + 0.5));
 			double K = K1 * ((1-B) + B * (docLength / docCount));
@@ -812,38 +828,51 @@ public class SimilarityMini {
 		return score;
 	}
 
-	//	public static HashSet<Pair<String, Double>> calculateBM25perQuery 
-	//		(HashMap<String, HashMap<String, Integer>> index, TreeMap<String, Integer> query) {
-	//		HashSet<Pair<String, Double>> queryScores = new HashSet<Pair<String, Double>>();
-	//		HashMap<String, Integer> numHits = calculateNumberOfHitsPerTerm(index, query);
-	//		HashMap<String, Integer> docLengths = calculateDocLengths(index);
-	//		double docCount = (double) docLengths.size();
-	//		double avgDocLength = (double) calculateAvgDocLength(docLengths, docCount);
-	//		for (String docKey : index.keySet()) {	
-	//			double docLength = (double) docLengths.get(docKey);
-	//			HashMap<String, Integer> document = index.get(docKey);
-	//			double score = calculateBM25PerDoc(document, query, numHits, 
-	//					docLength, docCount, avgDocLength);
-	//			Pair<String, Double> queryScoreOnDoc = new Pair<String, Double>(docKey, score);
-	//			queryScores.add(queryScoreOnDoc);
-	//		}
-	//		
-	//		return queryScores;
-	//	}
-	//	
-	//	public static HashMap<Integer, HashSet<Pair<String,Double>>> calculateBM25 
-	//		(HashMap<String, HashMap<String, Integer>> index, 
-	//				HashMap<Integer, TreeMap<String, Integer>> queries) {
-	//		HashMap<Integer, HashSet<Pair<String,Double>>> queryScores = 
-	//				new HashMap<Integer, HashSet<Pair<String,Double>>>();
-	//		for (Integer queryKey : queries.keySet()) {
-	//			TreeMap<String, Integer> query = queries.get(queryKey);
-	//			HashSet<Pair<String, Double>> queryScoreSet = 
-	//					calculateBM25perQuery(index, query);
-	//			queryScores.put(queryKey, queryScoreSet);
-	//		}
-	//		
-	//		return queryScores;
-	//	}
+	public static HashSet<Pair> calculateBM25perQuery 
+		(HashMap<String, HashMap<String, Integer>> index, TreeMap<String, Integer> query) {
+		HashSet<Pair> queryScores = new HashSet<Pair>();
+		HashMap<String, Integer> numHits = calculateNumberOfHitsPerTerm(index, query);
+		HashMap<String, Integer> docLengths = calculateDocLengths(index);
+		double docCount = (double) docLengths.size();
+		double avgDocLength = (double) calculateAvgDocLength(docLengths, docCount);
+		for (String docKey : index.keySet()) {	
+			double docLength = (double) docLengths.get(docKey);
+			HashMap<String, Integer> document = index.get(docKey);
+			double score = calculateBM25PerDoc(document, query, numHits, 
+					docLength, docCount, avgDocLength);
+			Pair queryScoreOnDoc = new Pair();
+			queryScoreOnDoc.setId(docKey);
+			queryScoreOnDoc.setVal(score);
+			queryScores.add(queryScoreOnDoc);
+		}
+		
+		return queryScores;
+	}
+	
+	public static HashMap<Integer, TreeSet<Pair>> calculateBM25 
+		(HashMap<String, HashMap<String, Integer>> index, 
+				HashMap<Integer, TreeMap<String, Integer>> queries) {
+		HashMap<Integer, TreeSet<Pair>> queryScores = 
+				new HashMap<Integer, TreeSet<Pair>>();
+		for (Integer queryKey : queries.keySet()) {
+			TreeMap<String, Integer> query = queries.get(queryKey);
+			HashSet<Pair> queryScoreSetUnsorted = 
+					calculateBM25perQuery(index, query);
+			TreeSet<Pair> queryScoreSet = new TreeSet<Pair>(queryScoreSetUnsorted);
+			queryScores.put(queryKey, queryScoreSet);
+		}
+		
+		return queryScores;
+	}
+
+	public static ArrayList<String> extractDocList 
+		(HashMap<Integer, TreeSet<Pair>> rankings, int queryKey) {
+		ArrayList<String> docList = new ArrayList<String>();
+		TreeSet<Pair> rankedDocs = rankings.get(queryKey);
+		for (Pair docRank : rankedDocs) {
+			docList.add(docRank.getId());
+		}
+		return docList;
+	}
 
 }
