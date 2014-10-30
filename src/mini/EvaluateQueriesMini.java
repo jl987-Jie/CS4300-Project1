@@ -98,7 +98,7 @@ public class EvaluateQueriesMini {
 	 * @param filename
 	 * @return
 	 */
-	private static Map<Integer, HashSet<String>> loadAnswers(String filename) {
+	public static Map<Integer, HashSet<String>> loadAnswers(String filename) {
 		HashMap<Integer, HashSet<String>> queryAnswerMap = new HashMap<Integer, HashSet<String>>();
 		BufferedReader in = null;
 		try {

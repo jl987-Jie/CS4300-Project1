@@ -19,9 +19,9 @@ public class Pair implements Comparable<Pair> {
 	}
 	@Override
 	public int compareTo(Pair o) {
-		if (this.val > o.val) {
+		if (this.val < o.val) {
 			return 1;
-		} else if (this.val < o.val) {
+		} else if (this.val > o.val) {
 			return -1;
 		}
 		return 0;
