@@ -278,9 +278,24 @@ public class SimilarityMini {
 			double docLength, double docCount, double avgDocLength) {
 		double score = 0;
 		for (String key : query.keySet()) {
-			double numHit = (double) numHits.get(key);
-			double docFreq = (double) document.get(key);
-			double queryFreq = (double) query.get(key);
+			double numHit;
+			double docFreq;
+			double queryFreq;
+			try {
+				numHit = (double) numHits.get(key);
+			} catch (NullPointerException e) {
+				numHit = 0.;
+			}
+			try {
+				docFreq = (double) document.get(key);
+			} catch (NullPointerException e) {
+				docFreq = 0.;
+			}
+			try {
+				queryFreq = (double) query.get(key);
+			} catch (NullPointerException e) {
+				queryFreq = 0.;
+			}
 			double subscore = Math.log((numHit + 0.5) 
 					/ (docCount - numHit + 0.5));
 			double K = K1 * ((1-B) + B * (docLength / docCount));
@@ -329,5 +344,14 @@ public class SimilarityMini {
 		return queryScores;
 	}
 
+	public static ArrayList<String> extractDocList 
+		(HashMap<Integer, TreeSet<Pair>> rankings, int queryKey) {
+		ArrayList<String> docList = new ArrayList<String>();
+		TreeSet<Pair> rankedDocs = rankings.get(queryKey);
+		for (Pair docRank : rankedDocs) {
+			docList.add(docRank.getId());
+		}
+		return docList;
+	}
 
 }

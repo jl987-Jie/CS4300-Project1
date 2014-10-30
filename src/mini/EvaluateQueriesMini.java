@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 // import lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -34,56 +36,155 @@ public class EvaluateQueriesMini {
 		String indexPath = "data/";
 		String medIndexName = "med_index.txt";
 		String cacmIndexName = "cacm_index.txt";
-
-		int cacmNumResults = 100;
-		int medNumResults = 100;
+		
+		HashMap<String, HashMap<String, Integer>> cacmDocTermIndex = null;
+		HashMap<Integer, TreeMap<String, Integer>> cacmQueryTermIndex = null;
+		HashMap<String, HashMap<String, Integer>> medDocTermIndex = null;
+		HashMap<Integer, TreeMap<String, Integer>> medQueryTermIndex = null;
+		
 
 		CharArraySet stopwords = createStopwordSet(stopwordFile);
-	
-
-//		System.out.println(evaluateMap(indexPath, cacmDocsDir, cacmQueryFile,
-//				cacmAnswerFile, cacmNumResults, cacmIndexName, stopwords));
-//
-//		System.out.println("\n");
-//
-//		System.out.println(evaluateMap(indexPath, medDocsDir, medQueryFile,
-//				medAnswerFile, medNumResults, medIndexName, stopwords));
 
 		int argsPosition = 1;
 		if (args != null && args[0].equals("run")) {
+			String collection = null;
+			
 			while (argsPosition <= (args.length -1)) {
-				switch (args[argsPosition]) {
-				case "-i":
-					String indexing = args[argsPosition + 1];
-					switch (indexing) {
-					case "cacm":
-						IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
-								cacmDocsDir, stopwords);
+				try {
+					switch (args[argsPosition]) {
+					case "-d":
+						collection = args[argsPosition + 1];
+						switch (collection) {
+						case "cacm":
+							break;
+						case "med":
+							break;
+						case "all":
+							break;
+						default:
+							System.out.println("Invalid document argument supplied");
+							break;
+						}
+						argsPosition += 2;
 						break;
-					case "med":
-						IndexFilesMini.buildIndex(indexPath, medIndexName, 
-								medDocsDir, stopwords);
+					case "-i":
+						switch (collection) {
+						case "cacm":
+							IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
+									cacmDocsDir, stopwords);
+							break;
+						case "med":
+							IndexFilesMini.buildIndex(indexPath, medIndexName, 
+									medDocsDir, stopwords);
+							break;
+						case "all":
+							IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
+									cacmDocsDir, stopwords);
+							IndexFilesMini.buildIndex(indexPath, medIndexName, 
+									medDocsDir, stopwords);
+							break;
+						default:
+							System.out.println("Invalid argument supplied to indexer");
+							break;
+						}
+						argsPosition += 2;
 						break;
-					case "all":
-						IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
-								cacmDocsDir, stopwords);
-						IndexFilesMini.buildIndex(indexPath, medIndexName, 
-								medDocsDir, stopwords);
+					case "-b":
+						String bmNumberStr = args[argsPosition + 1];
+						int bmNumberVal = 0;
+						double bmCacmResult = 0.0;
+						double bmMedResult = 0.0;
+						switch (bmNumberStr) {
+						case "total":
+							bmNumberVal = Integer.MAX_VALUE;
+							break;
+						default:
+							try {
+								bmNumberVal = Integer.parseInt(bmNumberStr);
+							} catch (NumberFormatException e){
+								System.out.println("Invalid argument supplied for number of documents");
+								break;
+							}
+							break;
+						}
+						if (collection.equals("cacm") || collection.equals("all")) {
+							if (cacmDocTermIndex == null) {
+								cacmDocTermIndex = SimilarityMini.getTermFrequency(
+										indexPath + cacmIndexName);
+							}
+							if (cacmQueryTermIndex == null) {
+								cacmQueryTermIndex = SimilarityMini.
+										loadTokenizedQueries(cacmQueryFile);
+							}
+							
+							bmCacmResult = evaluateMap(indexPath, cacmDocsDir, cacmQueryFile, 
+									cacmAnswerFile, bmNumberVal, cacmIndexName, stopwords,
+									"bm25", cacmDocTermIndex, cacmQueryTermIndex);
+							System.out.println("CACM BM25 MAP is " + bmCacmResult
+									+ "for " + bmNumberVal + " documents");
+						} else if (collection.equals("med") || collection.equals("all")) {
+							if (medDocTermIndex == null) {
+								medDocTermIndex = SimilarityMini.getTermFrequency(
+										indexPath + medIndexName);
+							}
+							if (medQueryTermIndex == null) {
+								medQueryTermIndex = SimilarityMini.
+										loadTokenizedQueries(medQueryFile);
+							}
+							bmMedResult = evaluateMap(indexPath, medDocsDir, medQueryFile, 
+									medAnswerFile, bmNumberVal, medIndexName, stopwords,
+									"bm25", medDocTermIndex, medQueryTermIndex);
+							System.out.println("MED BM25 MAP is " + bmMedResult
+									+ "for " + bmNumberVal + " documents");
+						} else {
+							System.out.println("Invalid arguments supplied for bm25");
+							System.out.println(collection);
+							System.out.println(bmNumberVal);
+						}
+						argsPosition += 2;
 						break;
+					case "-t":
+						String numberStr = args[argsPosition + 2];
+						int numberVal;
+						switch (numberStr) {
+						case "total":
+							break;
+						default:
+							try {
+								numberVal = Integer.parseInt(numberStr);
+							} catch (NumberFormatException e){
+								System.out.println("Invalid argument supplied for tfidf");
+								break;
+							}
+							break;
+						}
+						String tfidfType = args[argsPosition + 1];
+						switch (tfidfType) {
+						case "atcatc":
+							break;
+						case "atnatn":
+							break;
+						case "annbpn":
+							break;
+						case "ourown": //TODO- CHANGE NAME OF THIS IN RUNCONFIG
+							break;
+						case "all":
+							break;
+						}
+						argsPosition += 3;
+						break;
+						
 					default:
-						System.out.println("Invalid argument supplied to indexer");
+						System.out.println("Invalid arguments supplied to main");
 						break;
 					}
-					argsPosition += 2;
-					break;
-				default:
-					System.out.println("Invalid arguments supplied ok?");
-					break;
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.out.println("Invalid number of arguments supplied");
 				}
 			}
 			System.out.println("Done running.");
 		} else {
-			System.out.println("Invalid arguments supplied");
+			System.out.println("Invalid argument configuration supplied");
 		}
 	}
 
@@ -164,46 +265,10 @@ public class EvaluateQueriesMini {
 
 		return matches / results.size();
 	}
-
-//	private static double evaluate(String indexDir, String docsDir,
-//			String queryFile, String answerFile, int numResults,
-//			CharArraySet stopwords) {
-//
-//		// Build Index
-//		IndexFilesMini.buildIndex(indexDir, docsDir, stopwords);
-//
-//		// load queries and answer
-//		Map<Integer, String> queries = loadQueries(queryFile);
-//		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
-//
-//		// Search and evaluate
-//		double sum = 0;
-//		for (Integer i : queries.keySet()) {
-//			if (i == 1) {
-//				List<String> results = SearchFilesMini.searchQuery(indexDir, queries
-//						.get(i), numResults, stopwords);
-//				System.out.println("Results: " + results);
-//				sum += precision(queryAnswers.get(i), results);
-//				System.out.printf("\nTopic %d  ", i);
-//				System.out.print (results);
-//				System.out.println();
-//			}
-//
-//		}
-//
-//		return sum / queries.size();
-//	}
 	
 	/**
-	 * *************
-	 *  QUESTION 1
-	 * *************
-	 * 
-	 * Implement the MAP evaluation measure within the Java code used for 
-	 * Homework 2. Run that setup (stopwords turned off and no stemming) 
-	 * with the default Lucene similarity, retrieving 100 documents per query,
-	 * evaluated with the MAP measure. Do this for both the CACM and
-	 * Medlars collections.
+	 * Implement the MAP evaluation measure for a given set of results
+	 * from a similarity measure
 	 * 
 	 * @param indexDir
 	 * @param docsDir
@@ -217,27 +282,37 @@ public class EvaluateQueriesMini {
 	public static double evaluateMap(String indexDir, String docsDir, 
 			String queryFile, String answerFile, int numResults,
 			String indexName, CharArraySet stopwords,
-			ArrayList<String> results) {
+			String similarityMeasure, 
+			HashMap<String, HashMap<String, Integer>> docTermIndex,
+			HashMap<Integer, TreeMap<String, Integer>> queryTermIndex) {
 
-		// Build Index
-		IndexFilesMini.buildIndex(indexDir, indexName, docsDir, stopwords);
 
-//		// load queries and answer
-//		Map<Integer, String> queries = loadQueries(queryFile);
-//		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
-//
-//		// Search and evaluate
-//		double sum = 0;
-//		for (Integer i : queries.keySet()) {
-//			double numRelDocs = (double) queryAnswers.get(i).size();
-//			List<String> results = SearchFilesMini.searchQuery(indexDir, queries
-//					.get(i), numResults, stopwords);
-//			sum += mapPrecision(queryAnswers.get(i), results, numRelDocs);
-//		}
-//		System.out.println(sum + ", " + queries.size());
-//		return sum / queries.size();
+		// load queries and answer
+		Map<Integer, String> queries = loadQueries(queryFile);
+		Map<Integer, HashSet<String>> queryAnswers = loadAnswers(answerFile);
 		
-		return 1.0;
+		ArrayList<String> results = null;
+		HashMap<Integer, TreeSet<Pair>> bm25results = null;
+		// load results
+		if (similarityMeasure == "bm25") {
+			bm25results = SimilarityMini.calculateBM25(docTermIndex, queryTermIndex);	
+		}
+		
+		
+
+		// Search and evaluate
+		double sum = 0;
+		for (Integer i : queries.keySet()) {
+			double numRelDocs = (double) queryAnswers.get(i).size();
+			if (similarityMeasure == "bm25") {
+				results = SimilarityMini.extractDocList(bm25results, i);
+				results = new ArrayList<String>(results.subList(0, 
+						Math.min(numResults, docTermIndex.size() -1)));
+			}
+			sum += mapPrecision(queryAnswers.get(i), results, numRelDocs);
+		}
+		System.out.println(sum + ", " + queries.size());
+		return sum / queries.size();
 	}
 	
 	/**
