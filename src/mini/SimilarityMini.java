@@ -23,11 +23,12 @@ public class SimilarityMini {
 	static final String MEDL_IDX 	= "med_index.txt";
 	static final String CACM_QUERY 	= "data/cacm_processed.query";
 	static final String STOP_WORDS = "data/stopwords/stopwords_indri.txt";
-	
+
 	static HashSet<String> termSet = new HashSet<String>();
-	static String[] termsArray = new String[termSet.size()];
+	static String[] termsArray;
 	static HashMap<String, HashMap<String, Integer>> docTermFreqMap = new HashMap<String, HashMap<String, Integer>>();
 	static HashMap<String, Integer> invDocFreqMap = new HashMap<String, Integer>();
+	static HashMap<String, Integer> maxTfMap = new HashMap<String, Integer>();
 	static Pair[] relScore = new Pair[100000];
 	
 	//BM25 constants
@@ -35,24 +36,80 @@ public class SimilarityMini {
 	static final double K1 = 1.2;
 	static final double K2 = 100.;
 	
+	static int totalNumDocs = docTermFreqMap.size();
+
+	static HashMap<Integer, HashMap<String, Double>> queryIdRelevanceMap = 
+			new HashMap<Integer, HashMap<String, Double>>();
+
 	// Test Main Function.
 	public static void main(String[] args) {
-		
+
+
 		HashMap<String, HashMap<String, Integer>> map = getTermFrequency(DATA_DIR + CACM_IDX); // doc id -> term -> frequency.
 		HashMap<Integer, TreeMap<String, Integer>> queryMap = loadTokenizedQueries(CACM_QUERY); // query id -> term -> frequency.
-		
+
+		// need idf
+		HashMap<String, HashSet<String>> idfMap = getInverseDocFreq(map);
+
+		// initialize termsArray
+		termsArray = new String[termSet.size()];
+
+		// for each query, we have to calculate the similarity between 
+		// the query and the document (which is determined by the tf-idf score)
+
+		for (Integer queryId : queryMap.keySet()) {
+			for (String document : docTermFreqMap.keySet()) {
+
+
+			}
+		}
+
 		int totalNumDocs = map.size();
 		int maxTf = 0;
-		
-		
+
 	}
 
-	public static int[] retrieveDocs(int queryId, int k) {
-		int[] relevantResults = new int[k];
-		
-		return relevantResults;
+	// Stores the maxTf into maxTfMap.
+	public static void maxTfMap(HashMap<String, HashMap<String, Integer>> map) {
+		for (String docId : map.keySet()) {
+			int maxTf = 0;
+			HashMap<String, Integer> termFreqMap = map.get(docId); 
+			for (String term : termFreqMap.keySet()) {
+				if (termFreqMap.get(term) > maxTf) {
+					maxTf = termFreqMap.get(term);
+				}
+			}
+			maxTfMap.put(docId, maxTf);
+		}
 	}
-	
+
+	public static double[] getRelevance(Integer queryId, HashMap<String, HashSet<String>> idfMap) {
+
+		double[] relevanceArray = new double[termSet.size()];
+
+		for (String docId : docTermFreqMap.keySet()) {
+
+			for (int i = 0; i < relevanceArray.length; i++) {
+
+				HashMap<String, Integer> termFreqMap = docTermFreqMap.get(docId);
+
+				for (String s : termFreqMap.keySet())
+					if (termFreqMap.containsKey(termsArray[i])) {
+
+						int tf 	= termFreqMap.get(termsArray[i]);
+						int idf = idfMap.get(termsArray[i]).size();
+						int maxTf = maxTfMap.get(docId);
+
+						double tfScore 		= 0.5 + ((double) tf / maxTf);
+						double idfScore 	= Math.log10((double) totalNumDocs / idf);
+						relevanceArray[i] 	= tfScore * idfScore;
+					}
+			}
+
+		}
+		return relevanceArray;
+	}
+
 	// Sort the termsArray into lexicographically ordered.
 	public static void initializeTermsArray() {
 		int i = 0;
@@ -60,7 +117,7 @@ public class SimilarityMini {
 			termsArray[i] = s;
 			i++;
 		}
-		
+
 		Arrays.sort(termsArray);
 	}
 
@@ -232,9 +289,9 @@ public class SimilarityMini {
 	 */
 	public static HashMap<Integer, TreeMap<String, Integer>> loadTokenizedQueries(String filename) {
 		CharArraySet stopwords = EvaluateQueriesMini.createStopwordSet(STOP_WORDS);
-		
+
 		HashMap<Integer, TreeMap<String, Integer>> map 
-			= new HashMap<Integer, TreeMap<String, Integer>>();
+		= new HashMap<Integer, TreeMap<String, Integer>>();
 
 		BufferedReader in = null;
 

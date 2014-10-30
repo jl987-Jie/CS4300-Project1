@@ -219,7 +219,7 @@ public class EvaluateQueriesMini {
 	 * @param results List of retrieved documents by a query
 	 * @return MAP for a single query.
 	 */
-	private static double mapPrecision(HashSet<String> answers, 
+	public static double mapPrecision(HashSet<String> answers, 
 			List<String> results) {
 
 		double precision			= 0.0;
