@@ -9,7 +9,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -223,11 +223,11 @@ public class SimilarityMini {
 	 * @param filename
 	 * @return
 	 */
-	public static HashMap<Integer, HashMap<String, Integer>> loadTokenizedQueries(String filename) {
+	public static HashMap<Integer, TreeMap<String, Integer>> loadTokenizedQueries(String filename) {
 		CharArraySet stopwords = EvaluateQueriesMini.createStopwordSet(STOP_WORDS);
 		
-		HashMap<Integer, HashMap<String, Integer>> map 
-			= new HashMap<Integer, HashMap<String, Integer>>();
+		HashMap<Integer, TreeMap<String, Integer>> map 
+			= new HashMap<Integer, TreeMap<String, Integer>>();
 
 		BufferedReader in = null;
 
