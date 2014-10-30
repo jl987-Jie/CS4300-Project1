@@ -32,7 +32,7 @@ public class SimilarityMini {
 	public static void main(String[] args) {
 		
 		HashMap<String, HashMap<String, Integer>> map = getTermFrequency(DATA_DIR + CACM_IDX); // doc id -> term -> frequency.
-		HashMap<Integer, HashMap<String, Integer>> queryMap = loadTokenizedQueries(CACM_QUERY); // query id -> term -> frequency.
+		HashMap<Integer, TreeMap<String, Integer>> queryMap = loadTokenizedQueries(CACM_QUERY); // query id -> term -> frequency.
 		
 		int totalNumDocs = map.size();
 		int maxTf = 0;
