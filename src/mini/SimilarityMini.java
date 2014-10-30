@@ -20,54 +20,52 @@ import org.apache.lucene.analysis.util.CharArraySet;
 
 public class SimilarityMini {
 
-	static final String DATA_DIR 	= "data/";
-	static final String CACM_IDX 	= "cacm_index.txt";
-	static final String MEDL_IDX 	= "med_index.txt";
-	static final String CACM_QUERY 	= "data/cacm_processed.query";
-	static final String STOP_WORDS = "data/stopwords/stopwords_indri.txt";
-
 	static HashSet<String> termSet = new HashSet<String>();
 	static String[] termsArray;
 	static HashMap<String, HashMap<String, Integer>> docTermFreqMap = new HashMap<String, HashMap<String, Integer>>();
 	static HashMap<String, Integer> invDocFreqMap = new HashMap<String, Integer>();
 	static HashMap<String, Integer> maxTfMap = new HashMap<String, Integer>();
-	static Pair[] relScore = new Pair[100000];
-	
+
 	//BM25 constants
 	static final double B = 0.75;
 	static final double K1 = 1.2;
 	static final double K2 = 100.;
 	
 	static int totalNumDocs = docTermFreqMap.size();
-
 	static HashMap<Integer, HashMap<String, Double>> queryIdRelevanceMap = 
 			new HashMap<Integer, HashMap<String, Double>>();
 
-	// Test Main Function.
+	// Question 3.
 	public static void main(String[] args) {
 
+		HashMap<String, HashMap<String, Integer>> map 
+			= getTermFrequency(Constants.DATA_DIR + Constants.CACM_IDX); // doc id -> term -> frequency.
+		HashMap<Integer, TreeMap<String, Integer>> queryMap 
+			= loadTokenizedQueries(Constants.CACM_QUERY); // query id -> term -> frequency.
 
-		HashMap<String, HashMap<String, Integer>> map = getTermFrequency(DATA_DIR + CACM_IDX); // doc id -> term -> frequency.
-		HashMap<Integer, TreeMap<String, Integer>> queryMap = loadTokenizedQueries(CACM_QUERY); // query id -> term -> frequency.
-
-		// need idf
+		// need idf.
 		HashMap<String, HashSet<String>> idfMap = getInverseDocFreq(map);
 
 		// initialize termsArray
 		termsArray = new String[termSet.size()];
-
+		initializeTermsArray();
+		
+		// initialize maxTfMap
+		maxTfMap(map);
+		
 		// for each query, we have to calculate the similarity between 
 		// the query and the document (which is determined by the tf-idf score)
 
 		for (Integer queryId : queryMap.keySet()) {
-			for (String document : docTermFreqMap.keySet()) {
-
-
+			double[] result = getRelevance(queryId, idfMap);
+			
+			for (int i = 0; i < result.length; i++) {
+				if (result[i] != 0) {
+					System.out.println(result[i]);
+				}
 			}
+			break;
 		}
-
-		int totalNumDocs = map.size();
-		int maxTf = 0;
 
 	}
 
@@ -119,94 +117,7 @@ public class SimilarityMini {
 			termsArray[i] = s;
 			i++;
 		}
-
 		Arrays.sort(termsArray);
-	}
-
-	// Returns the term frequencies map for a given document id
-	public static HashMap<String, Integer> getTermFreq(String docId) {
-		return docTermFreqMap.get(docId);
-	}
-
-	// Returns an vector of tf-idf scores for a given docId.
-	public static double[] getVector(
-			String docId, String variant, int tf, int totalNumDocs, int numDocs, int maxTf) {
-
-		double[] vector = new double[termSet.size()];
-		HashMap<String, Integer> map = getTermFreq(docId);
-		for (int i = 0; i < termsArray.length; i++) {
-			if (map.containsKey(termsArray[i])) {
-				// calculate tfidf.
-				vector[i] = tfidf(variant, tf, totalNumDocs, numDocs, maxTf);
-			}
-		}
-		return vector;
-	}
-
-	/**
-	 * Calculate the tfidf given the following parameters.
-	 * 
-	 * @param variant variant of the tfidf
-	 * @param tf term frequency
-	 * @param totalNumDocs total number of documents in the collection
-	 * @param numDocs number of documents that contain this term
-	 * @param maxTf max term frequency in the collection
-	 * 
-	 * @return tfidf
-	 */
-	public static double tfidf(String variant, int tf, int totalNumDocs, int numDocs, int maxTf) {
-
-		double tfScore 	= 0.0;
-		double idfScore = 0.0;
-
-		switch (variant) {
-		case "atc.atc":
-			tfScore 	= 0.5 + ((double) tf / maxTf);
-			idfScore 	= Math.log10((double) totalNumDocs / numDocs);
-			break;
-
-		case "atn.atn":
-			tfScore 	= 0.5 + ((double) tf / maxTf);
-			idfScore 	= Math.log10((double) totalNumDocs / numDocs);
-			break;
-
-		case "ann.bpn":
-			// not sure what they are asking here...
-			break;
-
-		default:
-			// Our own method.
-			break;
-		}
-
-		return tfScore * idfScore;
-	}
-
-	// Dot Product (inner product) between two vectors.
-	public static double dotProduct(double[] v1, double[] v2) {
-		double prod = 0.0;
-		for (int i = 0; i < v1.length; i++) {
-			prod += v1[i] * v2[i];
-		}
-		return prod;
-	}
-
-	// Magnitude of vector.
-	public static double magnitude(double[] v1) {
-		double mag = 0.0;
-		for (int i = 0; i < v1.length; i++) {
-			mag += v1[i] * v1[i];
-		}
-		return Math.sqrt(mag);
-	}
-
-	// Cosine Normalization between two vectors.
-	public static double cosineNormalization(double[] v1, double[] v2) {
-		double prod = dotProduct(v1, v2);
-		double mag 	= magnitude(v1) * magnitude(v2);
-		if (mag == 0.0)
-			return 0.0;
-		return prod / mag;
 	}
 
 	/**
@@ -290,7 +201,7 @@ public class SimilarityMini {
 	 * @return
 	 */
 	public static HashMap<Integer, TreeMap<String, Integer>> loadTokenizedQueries(String filename) {
-		CharArraySet stopwords = EvaluateQueriesMini.createStopwordSet(STOP_WORDS);
+		CharArraySet stopwords = EvaluateQueriesMini.createStopwordSet(Constants.STOP_WORDS);
 
 		HashMap<Integer, TreeMap<String, Integer>> map 
 		= new HashMap<Integer, TreeMap<String, Integer>>();
@@ -363,6 +274,7 @@ public class SimilarityMini {
 		return numHits;
 	}
 	
+
 	public static double calculateBM25PerDoc(HashMap<String, Integer> document, 
 			TreeMap<String, Integer> query, HashMap<String, Integer> numHits,
 			double docLength, double docCount, double avgDocLength) {
@@ -415,15 +327,5 @@ public class SimilarityMini {
 		
 		return queryScores;
 	}
-	
-//	public static ArrayList<Double> calculateBM25(HashMap<String, HashMap<String, Integer>> index, 
-//			HashMap<String, Integer> docLengths, double avgDocLengths, 
-//			HashMap<Integer, TreeMap<String, Integer>> tokenizedQueries) {
-//		for (int currQueryKey : tokenizedQueries.keySet()) {
-//			TreeMap<String, Integer> currTokenizedQuery = tokenizedQueries.get(currQueryKey);
-//			for (String doc : index.keySet()) {
-//				
-//			}
-//		}
-//	}
+
 }
