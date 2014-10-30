@@ -80,7 +80,7 @@ public class SimilarityMini {
 	public static void main(String[] args) {
 
 		// uncomment each of these to calculate the MAP for question 3.
-		//printMapPartACACM();
+//		printMapPartACACM();
 		//		printMapPartAMed();
 		//		printMapPartBCACM();
 //		printMapPartBMed();
