@@ -121,7 +121,7 @@ public class EvaluateQueriesMini {
 									cacmAnswerFile, bmNumberVal, cacmIndexName, stopwords,
 									"bm25", cacmDocTermIndex, cacmQueryTermIndex);
 							System.out.println("CACM BM25 MAP is " + bmCacmResult
-									+ "for " + bmNumberVal + " documents");
+									+ " for " + bmNumberVal + " documents");
 						} else if (collection.equals("med") || collection.equals("all")) {
 							if (medDocTermIndex == null) {
 								medDocTermIndex = SimilarityMini.getTermFrequency(
@@ -176,6 +176,7 @@ public class EvaluateQueriesMini {
 						
 					default:
 						System.out.println("Invalid arguments supplied to main");
+						argsPosition += args.length;
 						break;
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {
