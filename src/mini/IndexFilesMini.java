@@ -4,19 +4,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
@@ -153,7 +148,6 @@ public class IndexFilesMini {
 	public static String createLine(String doc, TreeMap<String, Integer> dict) {
 		StringBuilder currentLine = new StringBuilder();
 		currentLine.append(doc + ": ");
-//		currentLine.append(" -> ");
 		
 		currentLine.append(dict.toString());
 		return currentLine.toString();

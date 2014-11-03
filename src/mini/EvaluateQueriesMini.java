@@ -22,9 +22,6 @@ public class EvaluateQueriesMini {
 		String cacmDocsDir = "data/cacm"; // directory containing CACM documents
 		String medDocsDir = "data/med"; // directory containing MED documents
 
-		String cacmIndexDir = "data/index/cacm"; // the directory where index is written into
-		String medIndexDir = "data/index/med"; // the directory where index is written into
-
 		String cacmQueryFile = "data/cacm_processed.query";    // CACM query file
 		String cacmAnswerFile = "data/cacm_processed.rel";   // CACM relevance judgements file
 
@@ -52,7 +49,7 @@ public class EvaluateQueriesMini {
 			while (argsPosition <= (args.length -1)) {
 				try {
 					switch (args[argsPosition]) {
-					case "-d":
+					case "docs":
 						collection = args[argsPosition + 1];
 						switch (collection) {
 						case "cacm":
@@ -67,7 +64,7 @@ public class EvaluateQueriesMini {
 						}
 						argsPosition += 2;
 						break;
-					case "-i":
+					case "index":
 						switch (collection) {
 						case "cacm":
 							IndexFilesMini.buildIndex(indexPath, cacmIndexName, 
@@ -89,7 +86,7 @@ public class EvaluateQueriesMini {
 						}
 						argsPosition += 1;
 						break;
-					case "-b":
+					case "bm25":
 						String bmNumberStr = args[argsPosition + 1];
 						int bmNumberVal = 0;
 						double bmCacmResult = 0.0;
@@ -141,12 +138,10 @@ public class EvaluateQueriesMini {
 						if (!(collection.equals("cacm") || collection.equals("med") 
 								|| collection.equals("all"))) {
 							System.out.println("Invalid arguments supplied for bm25");
-							System.out.println(collection);
-							System.out.println(bmNumberVal);
 						}
 						argsPosition += 2;
 						break;
-					case "-t":
+					case "tfidf":
 						String numberStr = args[argsPosition + 2];
 						int numberVal;
 						switch (numberStr) {
@@ -155,6 +150,7 @@ public class EvaluateQueriesMini {
 						default:
 							try {
 								numberVal = Integer.parseInt(numberStr);
+								System.out.println(numberVal);
 							} catch (NumberFormatException e){
 								System.out.println("Invalid argument supplied for tfidf");
 								break;
@@ -164,14 +160,70 @@ public class EvaluateQueriesMini {
 						String tfidfType = args[argsPosition + 1];
 						switch (tfidfType) {
 						case "atcatc":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapPartACACM();
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapPartAMed();
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
 							break;
 						case "atnatn":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapPartBCACM();
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapPartBMed();
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
 							break;
 						case "annbpn":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapPartCCACM();
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapPartCMed();
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
 							break;
-						case "ourown": //TODO- CHANGE NAME OF THIS IN RUNCONFIG
+						case "custom":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapPartDCACM();
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapPartDMed();
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
 							break;
 						case "all":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapPartACACM();
+								SimilarityMini.printMapPartBCACM();
+								SimilarityMini.printMapPartCCACM();
+								SimilarityMini.printMapPartDCACM();
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapPartAMed();
+								SimilarityMini.printMapPartBMed();
+								SimilarityMini.printMapPartCMed();
+								SimilarityMini.printMapPartDMed();
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
 							break;
 						}
 						argsPosition += 3;
@@ -257,17 +309,6 @@ public class EvaluateQueriesMini {
 			}
 		}
 		return queryAnswerMap;
-	}
-
-	private static double precision(HashSet<String> answers,
-			List<String> results) {
-		double matches = 0;
-		for (String result : results) {
-			if (answers.contains(result))
-				matches++;
-		}
-
-		return matches / results.size();
 	}
 	
 	/**

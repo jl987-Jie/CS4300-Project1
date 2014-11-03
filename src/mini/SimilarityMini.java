@@ -76,20 +76,6 @@ public class SimilarityMini {
 
 	}
 
-	// Question 3.
-	public static void main(String[] args) {
-
-		// uncomment each of these to calculate the MAP for question 3.
-//		printMapPartACACM();
-		//		printMapPartAMed();
-		//		printMapPartBCACM();
-//		printMapPartBMed();
-//		printMapPartCCACM();
-//		printMapPartCMed();
-//		printMapPartDCACM();
-		printMapPartDMed();
-	}
-
 	/*****************************************
 	 * QUESTION 3 PART A
 	 * ***************************************
@@ -104,7 +90,6 @@ public class SimilarityMini {
 		double[] cacmMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocs(i);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
@@ -126,7 +111,6 @@ public class SimilarityMini {
 		double[] medMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocs(i);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
@@ -151,7 +135,6 @@ public class SimilarityMini {
 		double[] cacmMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocsNoNorm(i);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
@@ -173,7 +156,6 @@ public class SimilarityMini {
 		double[] medMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocsNoNorm(i);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
@@ -198,7 +180,6 @@ public class SimilarityMini {
 		double[] cacmMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocsNoNormC(i);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
@@ -220,7 +201,6 @@ public class SimilarityMini {
 		double[] medMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocsNoNormC(i);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
@@ -245,7 +225,6 @@ public class SimilarityMini {
 		double[] cacmMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocsNoNormD(i);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
@@ -267,7 +246,6 @@ public class SimilarityMini {
 		double[] medMap = new double[100];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			System.out.println(i);
 			Pair[] result = relevantDocsNoNormD(i);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
