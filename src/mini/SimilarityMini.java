@@ -81,16 +81,17 @@ public class SimilarityMini {
 	 * ***************************************
 	 */
 	// Q3A: CACM
-	public static void printMapPartACACM() {
+	public static void printMapPartACACM(int numDocs) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		double[] cacmMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] cacmMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocs(i);
+			Pair[] result = relevantDocs(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -102,16 +103,17 @@ public class SimilarityMini {
 	}
 
 	// Q3A: MED
-	public static void printMapPartAMed() {
+	public static void printMapPartAMed(int numDocs) {
 		// MED
 
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		double[] medMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] medMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocs(i);
+			Pair[] result = relevantDocs(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -126,16 +128,17 @@ public class SimilarityMini {
 	 * QUESTION 3 PART B
 	 * ***************************************/
 	// Q3B: CACM
-	public static void printMapPartBCACM() {
+	public static void printMapPartBCACM(int numDocs) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		double[] cacmMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] cacmMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocsNoNorm(i);
+			Pair[] result = relevantDocsNoNorm(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -147,16 +150,17 @@ public class SimilarityMini {
 	}
 
 	// Q3B: MED
-	public static void printMapPartBMed() {
+	public static void printMapPartBMed(int numDocs) {
 		// MED
 
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		double[] medMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] medMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocsNoNorm(i);
+			Pair[] result = relevantDocsNoNorm(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -171,16 +175,17 @@ public class SimilarityMini {
 	 * QUESTION 3 PART C
 	 * ***************************************/
 	// Q3C: CACM
-	public static void printMapPartCCACM() {
+	public static void printMapPartCCACM(int numDocs) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		double[] cacmMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] cacmMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocsNoNormC(i);
+			Pair[] result = relevantDocsNoNormC(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -192,16 +197,17 @@ public class SimilarityMini {
 	}
 
 	// Q3C: MED
-	public static void printMapPartCMed() {
+	public static void printMapPartCMed(int numDocs) {
 		// MED
 
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		double[] medMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] medMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocsNoNormC(i);
+			Pair[] result = relevantDocsNoNormC(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -216,16 +222,17 @@ public class SimilarityMini {
 	 * QUESTION 3 PART D
 	 * ***************************************/
 	// Q3D: CACM
-	public static void printMapPartDCACM() {
+	public static void printMapPartDCACM(int numDocs) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		double[] cacmMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] cacmMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocsNoNormD(i);
+			Pair[] result = relevantDocsNoNormD(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -237,16 +244,17 @@ public class SimilarityMini {
 	}
 
 	// Q3D: MED
-	public static void printMapPartDMed() {
+	public static void printMapPartDMed(int numDocs) {
 		// MED
 
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		double[] medMap = new double[100];
+		int docSize = Math.min(numDocs, queryMap.size());
+		double[] medMap = new double[docSize];
 		System.out.println("Retrieving docs...");
 		for (int i = 1; i <= queryMap.size(); i++) {
-			Pair[] result = relevantDocsNoNormD(i);
+			Pair[] result = relevantDocsNoNormD(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
 		System.out.println("Calculating MAP...");
@@ -281,7 +289,7 @@ public class SimilarityMini {
 			sumPrecisionVal += val;
 		}
 
-		precision = sumPrecisionVal / matchedDocumentCount;
+		precision = sumPrecisionVal / ((double) answers.size());
 		return precision;
 	}
 
@@ -290,7 +298,7 @@ public class SimilarityMini {
 	 * @param queryId query id.
 	 * @return Pair[] with array that contains 100 such (doc, relevance score) pairs
 	 */
-	public static Pair[] relevantDocs(int queryId) {
+	public static Pair[] relevantDocs(int queryId, int numResults) {
 		Pair[] pairArray = new Pair[docTermFreqMap.size()];
 
 		int i = 0;
@@ -303,8 +311,8 @@ public class SimilarityMini {
 		}
 		Arrays.sort(pairArray);
 
-		Pair[] result = new Pair[100];
-		for (int j = 0; j < 100; j++) {
+		Pair[] result = new Pair[numResults];
+		for (int j = 0; j < result.length; j++) {
 			result[j] = pairArray[j];
 		}
 		return result;
@@ -334,7 +342,7 @@ public class SimilarityMini {
 	 * @param queryId query id.
 	 * @return Pair[] with array that contains 100 such (doc, relevance score) pairs
 	 */
-	public static Pair[] relevantDocsNoNorm(int queryId) {
+	public static Pair[] relevantDocsNoNorm(int queryId, int numResults) {
 		Pair[] pairArray = new Pair[docTermFreqMap.size()];
 
 		int i = 0;
@@ -347,8 +355,8 @@ public class SimilarityMini {
 		}
 		Arrays.sort(pairArray);
 
-		Pair[] result = new Pair[100];
-		for (int j = 0; j < 100; j++) {
+		Pair[] result = new Pair[numResults];
+		for (int j = 0; j < result.length; j++) {
 			result[j] = pairArray[j];
 		}
 		return result;
@@ -363,7 +371,7 @@ public class SimilarityMini {
 		return innerProd;
 	}
 
-	public static Pair[] relevantDocsNoNormC(int queryId) {
+	public static Pair[] relevantDocsNoNormC(int queryId, int numResults) {
 		Pair[] pairArray = new Pair[docTermFreqMap.size()];
 
 		int i = 0;
@@ -376,8 +384,8 @@ public class SimilarityMini {
 		}
 		Arrays.sort(pairArray);
 
-		Pair[] result = new Pair[100];
-		for (int j = 0; j < 100; j++) {
+		Pair[] result = new Pair[numResults];
+		for (int j = 0; j < result.length; j++) {
 			result[j] = pairArray[j];
 		}
 		return result;
@@ -392,7 +400,7 @@ public class SimilarityMini {
 		return innerProd;
 	}
 	
-	public static Pair[] relevantDocsNoNormD(int queryId) {
+	public static Pair[] relevantDocsNoNormD(int queryId, int numResults) {
 		Pair[] pairArray = new Pair[docTermFreqMap.size()];
 
 		int i = 0;
@@ -405,8 +413,8 @@ public class SimilarityMini {
 		}
 		Arrays.sort(pairArray);
 
-		Pair[] result = new Pair[100];
-		for (int j = 0; j < 100; j++) {
+		Pair[] result = new Pair[numResults];
+		for (int j = 0; j < numResults; j++) {
 			result[j] = pairArray[j];
 		}
 		return result;

@@ -143,14 +143,14 @@ public class EvaluateQueriesMini {
 						break;
 					case "tfidf":
 						String numberStr = args[argsPosition + 2];
-						int numberVal;
+						int numberVal = 0;
 						switch (numberStr) {
 						case "total":
+							numberVal = Integer.MAX_VALUE;
 							break;
 						default:
 							try {
 								numberVal = Integer.parseInt(numberStr);
-								System.out.println(numberVal);
 							} catch (NumberFormatException e){
 								System.out.println("Invalid argument supplied for tfidf");
 								break;
@@ -161,10 +161,10 @@ public class EvaluateQueriesMini {
 						switch (tfidfType) {
 						case "atcatc":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartACACM();
+								SimilarityMini.printMapPartACACM(numberVal);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartAMed();
+								SimilarityMini.printMapPartAMed(numberVal);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -173,10 +173,10 @@ public class EvaluateQueriesMini {
 							break;
 						case "atnatn":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartBCACM();
+								SimilarityMini.printMapPartBCACM(numberVal);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartBMed();
+								SimilarityMini.printMapPartBMed(numberVal);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -185,10 +185,10 @@ public class EvaluateQueriesMini {
 							break;
 						case "annbpn":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartCCACM();
+								SimilarityMini.printMapPartCCACM(numberVal);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartCMed();
+								SimilarityMini.printMapPartCMed(numberVal);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -197,10 +197,10 @@ public class EvaluateQueriesMini {
 							break;
 						case "custom":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartDCACM();
+								SimilarityMini.printMapPartDCACM(numberVal);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartDMed();
+								SimilarityMini.printMapPartDMed(numberVal);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -209,16 +209,16 @@ public class EvaluateQueriesMini {
 							break;
 						case "all":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartACACM();
-								SimilarityMini.printMapPartBCACM();
-								SimilarityMini.printMapPartCCACM();
-								SimilarityMini.printMapPartDCACM();
+								SimilarityMini.printMapPartACACM(numberVal);
+								SimilarityMini.printMapPartBCACM(numberVal);
+								SimilarityMini.printMapPartCCACM(numberVal);
+								SimilarityMini.printMapPartDCACM(numberVal);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartAMed();
-								SimilarityMini.printMapPartBMed();
-								SimilarityMini.printMapPartCMed();
-								SimilarityMini.printMapPartDMed();
+								SimilarityMini.printMapPartAMed(numberVal);
+								SimilarityMini.printMapPartBMed(numberVal);
+								SimilarityMini.printMapPartCMed(numberVal);
+								SimilarityMini.printMapPartDMed(numberVal);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -348,7 +348,6 @@ public class EvaluateQueriesMini {
 		// Search and evaluate
 		double sum = 0;
 		for (Integer i : queries.keySet()) {
-			double numRelDocs = (double) queryAnswers.get(i).size();
 			if (similarityMeasure == "bm25") {
 				results = SimilarityMini.extractDocList(bm25results, i);
 				try {
@@ -357,7 +356,7 @@ public class EvaluateQueriesMini {
 				} catch (IndexOutOfBoundsException e) {
 				}
 			}
-			sum += mapPrecision(queryAnswers.get(i), results, numRelDocs);
+			sum += mapPrecision(queryAnswers.get(i), results);
 		}
 		System.out.println(sum + ", " + queries.size());
 		return sum / queries.size();
@@ -373,7 +372,7 @@ public class EvaluateQueriesMini {
 	 * @return MAP for a single query.
 	 */
 	public static double mapPrecision(HashSet<String> answers, 
-			ArrayList<String> results, double numRelDocs) {
+			ArrayList<String> results) {
 
 		double precision			= 0.0;
 		int matchedDocumentCount 	= 0;
@@ -395,7 +394,7 @@ public class EvaluateQueriesMini {
 			sumPrecisionVal += val;
 		}
 
-		precision = sumPrecisionVal / numRelDocs;
+		precision = sumPrecisionVal / ((double) answers.size());
 		return precision;
 	}
 	
