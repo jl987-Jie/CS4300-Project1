@@ -347,21 +347,21 @@ public class SimilarityMini {
 	}
 	
 	if (verbosity.equals("verbose")) {
+	  ArrayList<String> retDocs = new ArrayList<String>();
+	  ArrayList<String> nonRetDocs = new ArrayList<String>();
 	  for (String doc : answers) {
-		ArrayList<String> retDocs = new ArrayList<String>();
-		ArrayList<String> nonRetDocs = new ArrayList<String>();
-		if (resultsDocIds.contains(doc)) {
-		  int index = resultsDocIds.indexOf(doc);
-		  String fullDoc = doc + " at " + index;
-		  retDocs.add(fullDoc);
-		} else {
-		  nonRetDocs.add(doc);
-		}
-		verboseFile.println("Relevant documents retrieved: " + retDocs);
-		verboseFile.println("Relevant documents not retrieved: " + nonRetDocs);
-		verboseFile.println(retDocs.size() + " of " + answers.size() 
-			+ " relevant docs retrieved");
+	  	if (resultsDocIds.contains(doc)) {
+	  		int index = resultsDocIds.indexOf(doc);
+	  		String fullDoc = doc + " at " + index;
+	  		retDocs.add(fullDoc);
+	  	} else {
+	  		nonRetDocs.add(doc);
+	  	}
 	  }
+  		verboseFile.println("Relevant documents retrieved: " + retDocs);
+  		verboseFile.println("Relevant documents not retrieved: " + nonRetDocs);
+  		verboseFile.println(retDocs.size() + " of " + answers.size() 
+  			+ " relevant docs retrieved");
 	}
 
 	for (double val : precisionList) {
