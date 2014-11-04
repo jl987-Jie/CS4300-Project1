@@ -258,7 +258,7 @@ public class EvaluateQueriesMini {
 							}
 							break;
 						}
-						argsPosition += 3;
+						argsPosition += 4;
 						break;
 						
 					default:
