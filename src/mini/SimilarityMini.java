@@ -87,14 +87,14 @@ public class SimilarityMini {
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] cacmMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3a. Retrieving docs from CACM...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocs(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for CACM tfidf atc.atc...");
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
 			sum += cacmMap[i];
@@ -109,14 +109,14 @@ public class SimilarityMini {
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] medMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3a. Retrieving docs from MED...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocs(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for MED tfidf atc.atc...");
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
@@ -134,14 +134,14 @@ public class SimilarityMini {
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] cacmMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3b. Retrieving docs from CACM...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocsNoNorm(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for CACM tfidf atn.atn...");
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
 			sum += cacmMap[i];
@@ -156,14 +156,14 @@ public class SimilarityMini {
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] medMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3b. Retrieving docs from MED...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocsNoNorm(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for MED tfidf atn.atn...");
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
@@ -181,14 +181,14 @@ public class SimilarityMini {
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] cacmMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3c. Retrieving docs from CACM...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocsNoNormC(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for CACM tfidf ann.bpn...");
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
 			sum += cacmMap[i];
@@ -203,14 +203,14 @@ public class SimilarityMini {
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] medMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3c. Retrieving docs from MED...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocsNoNormC(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for MED tfidf ann.bpn...");
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
@@ -228,14 +228,14 @@ public class SimilarityMini {
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
 		// CACM
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] cacmMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3d. Retrieving docs from CACM...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocsNoNormD(i, numDocs);
 			cacmMap[i] = mapPrecision(answerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for CACM tfidf ltc.ltc...");
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
 			sum += cacmMap[i];
@@ -250,14 +250,14 @@ public class SimilarityMini {
 		initMed();
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
-		int docSize = Math.min(numDocs, queryMap.size());
+		int docSize = Math.min(numDocs, totalNumDocs);
 		double[] medMap = new double[docSize];
-		System.out.println("Retrieving docs...");
+		System.out.println("3d. Retrieving docs from MED...");
 		for (int i = 1; i <= queryMap.size(); i++) {
 			Pair[] result = relevantDocsNoNormD(i, numDocs);
 			medMap[i] = mapPrecision(medAnswerMap.get(i), result);
 		}
-		System.out.println("Calculating MAP...");
+		System.out.println("Calculating MAP for MED tfidf ltc.ltc...");
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
@@ -854,7 +854,7 @@ public class SimilarityMini {
 	public static ArrayList<String> extractDocList 
 		(HashMap<Integer, TreeSet<Pair>> rankings, int queryKey) {
 		ArrayList<String> docList = new ArrayList<String>();
-		TreeSet<Pair> rankedDocs = rankings.get(queryKey);
+		TreeSet<Pair> rankedDocs = (TreeSet<Pair>) rankings.get(queryKey).descendingSet();
 		for (Pair docRank : rankedDocs) {
 			docList.add(docRank.getId());
 		}
