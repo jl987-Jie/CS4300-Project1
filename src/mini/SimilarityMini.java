@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +82,7 @@ public class SimilarityMini {
 	 * ***************************************
 	 */
 	// Q3A: CACM
-	public static void printMapPartACACM(int numDocs) {
+	public static void printMapPartACACM(int numDocs, String verbosity, PrintWriter verboseFile) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
@@ -97,13 +98,17 @@ public class SimilarityMini {
 		System.out.println("Calculating MAP for CACM tfidf atc.atc...");
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3a atcatc CACM Query " + i + " with AP=" + cacmMap[i]);
+			}
 			sum += cacmMap[i];
 		}
-		System.out.println("Question 3a CACM MAP: " + sum/queryMap.size());
+		System.out.println("Question 3a atcatc CACM MAP: " + sum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3a atcatc CACM MAP: " + sum/queryMap.size());
 	}
 
 	// Q3A: MED
-	public static void printMapPartAMed(int numDocs) {
+	public static void printMapPartAMed(int numDocs, String verbosity, PrintWriter verboseFile) {
 		// MED
 
 		initMed();
@@ -119,16 +124,20 @@ public class SimilarityMini {
 		System.out.println("Calculating MAP for MED tfidf atc.atc...");
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3a atcatc MED Query " + i + " with AP=" + medMap[i]);
+			}
 			medsum += medMap[i];
 		}
-		System.out.println("Question 3a MED MAP: " + medsum/queryMap.size());
+		System.out.println("Question 3a atcatc MED MAP: " + medsum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3a atcatc MED MAP: " + medsum/queryMap.size());
 	}
 
 	/*****************************************
 	 * QUESTION 3 PART B
 	 * ***************************************/
 	// Q3B: CACM
-	public static void printMapPartBCACM(int numDocs) {
+	public static void printMapPartBCACM(int numDocs, String verbosity, PrintWriter verboseFile) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
@@ -144,13 +153,17 @@ public class SimilarityMini {
 		System.out.println("Calculating MAP for CACM tfidf atn.atn...");
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3b atnatn CACM Query " + i + " with AP=" + cacmMap[i]);
+			}
 			sum += cacmMap[i];
 		}
-		System.out.println("Question 3b CACM MAP: " + sum/queryMap.size());
+		System.out.println("Question 3b atnatn CACM MAP: " + sum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3b atnatn CACM MAP: " + sum/queryMap.size());
 	}
 
 	// Q3B: MED
-	public static void printMapPartBMed(int numDocs) {
+	public static void printMapPartBMed(int numDocs, String verbosity, PrintWriter verboseFile) {
 		// MED
 
 		initMed();
@@ -167,15 +180,19 @@ public class SimilarityMini {
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3b atnatn MED Query " + i + " with AP=" + medMap[i]);
+			}
 		}
-		System.out.println("Question 3b MED MAP: " + medsum/queryMap.size());
+		System.out.println("Question 3b atnatn MED MAP: " + medsum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3b atnatn MED MAP: " + medsum/queryMap.size());
 	}
 
 	/*****************************************
 	 * QUESTION 3 PART C
 	 * ***************************************/
 	// Q3C: CACM
-	public static void printMapPartCCACM(int numDocs) {
+	public static void printMapPartCCACM(int numDocs, String verbosity, PrintWriter verboseFile) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
@@ -192,12 +209,16 @@ public class SimilarityMini {
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
 			sum += cacmMap[i];
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3c annbpn CACM Query " + i + " with AP=" + cacmMap[i]);
+			}
 		}
-		System.out.println("Question 3c CACM MAP: " + sum/queryMap.size());
+		System.out.println("Question 3c annbpn CACM MAP: " + sum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3c annbpn CACM MAP: " + sum/queryMap.size());
 	}
 
 	// Q3C: MED
-	public static void printMapPartCMed(int numDocs) {
+	public static void printMapPartCMed(int numDocs, String verbosity, PrintWriter verboseFile) {
 		// MED
 
 		initMed();
@@ -214,15 +235,19 @@ public class SimilarityMini {
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3c annbpn MED Query " + i + " with AP=" + medMap[i]);
+			}
 		}
-		System.out.println("Question 3c MED MAP: " + medsum/queryMap.size());
+		System.out.println("Question 3c annbpn MED MAP: " + medsum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3c annpbn MED MAP: " + medsum/queryMap.size());
 	}
 	
 	/*****************************************
 	 * QUESTION 3 PART D
 	 * ***************************************/
 	// Q3D: CACM
-	public static void printMapPartDCACM(int numDocs) {
+	public static void printMapPartDCACM(int numDocs, String verbosity, PrintWriter verboseFile) {
 		init();
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
@@ -239,12 +264,16 @@ public class SimilarityMini {
 		double sum = 0.0;
 		for (int i = 0; i < cacmMap.length; i++) {
 			sum += cacmMap[i];
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3d ltcltc CACM Query " + i + " with AP=" + cacmMap[i]);
+			}
 		}
-		System.out.println("Question 3d CACM MAP: " + sum/queryMap.size());
+		System.out.println("Question 3d ltcltc CACM MAP: " + sum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3d ltcltc CACM MAP: " + sum/queryMap.size());
 	}
 
 	// Q3D: MED
-	public static void printMapPartDMed(int numDocs) {
+	public static void printMapPartDMed(int numDocs, String verbosity, PrintWriter verboseFile) {
 		// MED
 
 		initMed();
@@ -261,8 +290,12 @@ public class SimilarityMini {
 		double medsum = 0.0;
 		for (int i = 0; i < medMap.length; i++) {
 			medsum += medMap[i];
+			if (verbosity.equals("verbose")) {
+				verboseFile.println("3d ltcltc MED Query " + i + " with AP=" + medMap[i]);
+			}
 		}
 		System.out.println("Question 3d MED MAP: " + medsum/queryMap.size());
+		if (verbosity.equals("verbose"))  verboseFile.println("Question 3d ltcltc MED MAP: " + medsum/queryMap.size());
 	}
 
 	// Calculates the MAP for a single query.
@@ -294,9 +327,9 @@ public class SimilarityMini {
 	}
 
 	/**
-	 * Returns the top 100 most relevant documents to this query.
+	 * Returns the top numResults most relevant documents to this query.
 	 * @param queryId query id.
-	 * @return Pair[] with array that contains 100 such (doc, relevance score) pairs
+	 * @return Pair[] with array that contains numResults such (doc, relevance score) pairs
 	 */
 	public static Pair[] relevantDocs(int queryId, int numResults) {
 		Pair[] pairArray = new Pair[docTermFreqMap.size()];
@@ -338,9 +371,9 @@ public class SimilarityMini {
 	}
 
 	/**
-	 * Returns the top 100 most relevant documents to this query.
+	 * Returns the top numResults most relevant documents to this query.
 	 * @param queryId query id.
-	 * @return Pair[] with array that contains 100 such (doc, relevance score) pairs
+	 * @return Pair[] with array that contains numResults such (doc, relevance score) pairs
 	 */
 	public static Pair[] relevantDocsNoNorm(int queryId, int numResults) {
 		Pair[] pairArray = new Pair[docTermFreqMap.size()];
@@ -742,6 +775,8 @@ public class SimilarityMini {
 		return map;
 	}
 
+	// Given an index loaded into a hashmap of strings to hashmaps of strings to integers,
+	// calculate the lengths of each document and store in a hashmap of strings to integer
 	public static HashMap<String, Integer> calculateDocLengths (HashMap<String, HashMap<String, Integer>> index) {
 		HashMap<String, Integer> docLength = new HashMap<String, Integer>();
 		for (String key : index.keySet()) {
@@ -756,6 +791,7 @@ public class SimilarityMini {
 		return docLength;
 	}
 
+	// Given a hashmap from strings to integers of document lengths, calculate the avg doc length
 	public static double calculateAvgDocLength(HashMap<String, Integer> docLengths,
 			double docCount) {
 		int totalDocLength = 0;
@@ -766,6 +802,8 @@ public class SimilarityMini {
 		return (((double) totalDocLength) / docCount);
 	}
 
+	// Given an index loaded into a hashmap and a treemap of tokenized query terms with their frequency,
+	// return a hashmap containing the number of times the query term occurs
 	public static HashMap<String, Integer> calculateNumberOfHitsPerTerm(HashMap<String, HashMap<String,Integer>> index, 
 			TreeMap<String, Integer> query) {
 		HashMap<String, Integer> numHits = new HashMap<String, Integer>();
@@ -779,10 +817,11 @@ public class SimilarityMini {
 		return numHits;
 	}
 
-
+	// For a given tokenized document and query, calculate the BM25
 	public static double calculateBM25PerDoc(HashMap<String, Integer> document, 
 			TreeMap<String, Integer> query, HashMap<String, Integer> numHits,
-			double docLength, double docCount, double avgDocLength) {
+			double docLength, double docCount, double avgDocLength, 
+			TreeMap<String, Double> weights) {
 		double score = 0;
 		for (String key : query.keySet()) {
 			double numHit;
@@ -803,58 +842,70 @@ public class SimilarityMini {
 			} catch (NullPointerException e) {
 				queryFreq = 0.;
 			}
-			double subscore = Math.log((numHit + 0.5) 
-					/ (docCount - numHit + 0.5));
-			double K = K1 * ((1-B) + B * (docLength / docCount));
+			double subscore = Math.log((docCount - numHit + 0.5) 
+					/ (numHit + 0.5));
+			double K = K1 * ((1-B) + B * (docLength / avgDocLength));
 			subscore = subscore * (((K1 + 1) * docFreq) / (K + docFreq));
-			subscore = subscore * (((K2 + 1) * queryFreq) / (K + queryFreq));
+			subscore = subscore * (((K2 + 1) * queryFreq) / (K2 + queryFreq));
+			weights.put(key, subscore);
 			score += subscore;
 		}
 
 		return score;
 	}
 
+	// Calculate BM25 for a given query over all documents and store in a hashset
 	public static HashSet<Pair> calculateBM25perQuery 
-		(HashMap<String, HashMap<String, Integer>> index, TreeMap<String, Integer> query) {
+		(HashMap<String, HashMap<String, Integer>> index, TreeMap<String, Integer> query,
+				HashMap<String, TreeMap<String, Double>> docWeights) {
 		HashSet<Pair> queryScores = new HashSet<Pair>();
 		HashMap<String, Integer> numHits = calculateNumberOfHitsPerTerm(index, query);
 		HashMap<String, Integer> docLengths = calculateDocLengths(index);
 		double docCount = (double) docLengths.size();
 		double avgDocLength = (double) calculateAvgDocLength(docLengths, docCount);
 		for (String docKey : index.keySet()) {	
+			TreeMap<String, Double> weights = new TreeMap<String, Double>();
 			double docLength = (double) docLengths.get(docKey);
 			HashMap<String, Integer> document = index.get(docKey);
 			double score = calculateBM25PerDoc(document, query, numHits, 
-					docLength, docCount, avgDocLength);
+					docLength, docCount, avgDocLength, weights);
 			Pair queryScoreOnDoc = new Pair();
 			queryScoreOnDoc.setId(docKey);
 			queryScoreOnDoc.setVal(score);
 			queryScores.add(queryScoreOnDoc);
+			docWeights.put(docKey, weights);
 		}
 		
 		return queryScores;
 	}
 	
+	//Calculate BM25 for all queries, stores in HashMap of query IDs to lists of document-score pairs
 	public static HashMap<Integer, TreeSet<Pair>> calculateBM25 
 		(HashMap<String, HashMap<String, Integer>> index, 
-				HashMap<Integer, TreeMap<String, Integer>> queries) {
+				HashMap<Integer, TreeMap<String, Integer>> queries, 
+				HashMap<Integer, HashMap<String, TreeMap<String, Double>>> queryWeights) {
 		HashMap<Integer, TreeSet<Pair>> queryScores = 
 				new HashMap<Integer, TreeSet<Pair>>();
 		for (Integer queryKey : queries.keySet()) {
+			HashMap<String, TreeMap<String, Double>> docWeights = 
+					new HashMap<String, TreeMap<String, Double>>();
 			TreeMap<String, Integer> query = queries.get(queryKey);
 			HashSet<Pair> queryScoreSetUnsorted = 
-					calculateBM25perQuery(index, query);
+					calculateBM25perQuery(index, query, docWeights);
 			TreeSet<Pair> queryScoreSet = new TreeSet<Pair>(queryScoreSetUnsorted);
 			queryScores.put(queryKey, queryScoreSet);
+			queryWeights.put(queryKey, docWeights);
 		}
 		
 		return queryScores;
 	}
 
+	// From the HashMap of query IDs to lists of document-score pairs returned in calculate bm25,
+	// extract the ranked document list into an ArrayList
 	public static ArrayList<String> extractDocList 
 		(HashMap<Integer, TreeSet<Pair>> rankings, int queryKey) {
 		ArrayList<String> docList = new ArrayList<String>();
-		TreeSet<Pair> rankedDocs = (TreeSet<Pair>) rankings.get(queryKey).descendingSet();
+		TreeSet<Pair> rankedDocs = rankings.get(queryKey);
 		for (Pair docRank : rankedDocs) {
 			docList.add(docRank.getId());
 		}
