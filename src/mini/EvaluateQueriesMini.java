@@ -34,11 +34,13 @@ public class EvaluateQueriesMini {
 		
 		String stopwordFile = "data/stopwords/stopwords_indri.txt"; // Indri stopword file 
 		
+		// new location of indices
 		String indexPath = "data/";
 		String medIndexName = "med_index.txt";
 		String cacmIndexName = "cacm_index.txt";
 		
-		String verbosePath = "data/verbose_log.txt";
+		// verbose information if verbose flag on; used for failure analysis
+		String verbosePath = "data/verbose_log.txt"; // should be in gitignore
 		PrintWriter outVerbose = null;
 		try {
 			PrintWriter reset = new PrintWriter(verbosePath);

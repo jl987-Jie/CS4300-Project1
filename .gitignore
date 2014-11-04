@@ -85,3 +85,4 @@ local.properties
 
 # Specific to this project
 /data/index/**
+/data/verbose_log.txt
