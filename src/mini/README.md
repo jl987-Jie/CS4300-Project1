@@ -15,6 +15,6 @@ Then, set up the run configurations for the EvaluateQueriesMini class by going t
 So, for example, to run on both document sets, index the documents, retrieve based on all tfidf measures with 100 documents retrieved and no verbose logging, and retrieve based on bm25 with no verbose logging (i.e., the default setup described in questions 3 and 4), run
 ```run docs all index tfidf all 100 normal bm25 100 normal```
 
-**NOTE:** verbose logging creates a very, very large file (at least 15 Gb) and should not be run unless you want to perform detailed failure analysis with the data. It outputs the term weights for each document for each query, depending on which similarity measure you use, the overall MAP values for each similarity metric, and the relevant documents retrieved and not retrieved. 
+**NOTE:** verbose logging creates a very, very, VERY large file (at least 15 Gb for 100 documents retrieved) and should not be run unless you want to perform detailed failure analysis with the data. It outputs the term weights for each document for each query, depending on which similarity measure you use, the overall MAP values for each similarity metric, and the relevant documents retrieved and not retrieved. 
 
 **NOTE:** the tfidf evaluation is currently somewhat slow, especially for CACM; be patient when running it.

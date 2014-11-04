@@ -422,14 +422,16 @@ public class EvaluateQueriesMini {
 			}
 			sum += currPrecision;
 		}
-		for (Integer i : queries.keySet()) {
-			if (queryFile.contains("cacm")) {
-				verboseFile.println("CACM Query " + i);
-			} else {
-				verboseFile.println("MED Query " + i);
+		if (verbosity.equals("verbose")) {
+			for (Integer i : queries.keySet()) {
+				if (queryFile.contains("cacm")) {
+					verboseFile.println("CACM Query " + i);
+				} else {
+					verboseFile.println("MED Query " + i);
+				}
+				HashMap<String, TreeMap<String, Double>> docWeights = queryWeights.get(i);
+				verboseFile.println("Term weights: " + docWeights);
 			}
-			HashMap<String, TreeMap<String, Double>> docWeights = queryWeights.get(i);
-			verboseFile.println("Term weights: " + docWeights);
 		}
 		return sum / queries.size();
 	}
