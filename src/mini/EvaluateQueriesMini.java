@@ -1,10 +1,13 @@
 package mini;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 
 // import lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -30,9 +34,23 @@ public class EvaluateQueriesMini {
 		
 		String stopwordFile = "data/stopwords/stopwords_indri.txt"; // Indri stopword file 
 		
+		// new location of indices
 		String indexPath = "data/";
 		String medIndexName = "med_index.txt";
 		String cacmIndexName = "cacm_index.txt";
+		
+		// verbose information if verbose flag on; used for failure analysis
+		String verbosePath = "data/verbose_log.txt"; // should be in gitignore
+		PrintWriter outVerbose = null;
+		try {
+			PrintWriter reset = new PrintWriter(verbosePath);
+			reset.close();
+			outVerbose = new PrintWriter(new BufferedWriter(new FileWriter(verbosePath, true)));
+		} catch (FileNotFoundException e) {
+			System.out.println("Verbose file not found");
+		} catch (IOException e) {
+			System.out.println("Can't print to verbose file");
+		}
 		
 		HashMap<String, HashMap<String, Integer>> cacmDocTermIndex = null;
 		HashMap<Integer, TreeMap<String, Integer>> cacmQueryTermIndex = null;
@@ -91,6 +109,7 @@ public class EvaluateQueriesMini {
 						int bmNumberVal = 0;
 						double bmCacmResult = 0.0;
 						double bmMedResult = 0.0;
+						String bmVerbosity = args[argsPosition + 2];
 						switch (bmNumberStr) {
 						case "total":
 							bmNumberVal = Integer.MAX_VALUE;
@@ -114,11 +133,18 @@ public class EvaluateQueriesMini {
 										loadTokenizedQueries(cacmQueryFile);
 							}
 							
+							HashMap<Integer, HashMap<String, TreeMap<String, Double>>> cacmQueryWeights = 
+									new HashMap<Integer, HashMap<String, TreeMap<String, Double>>>();
 							bmCacmResult = evaluateMap(indexPath, cacmDocsDir, cacmQueryFile, 
 									cacmAnswerFile, bmNumberVal, cacmIndexName, stopwords,
-									"bm25", cacmDocTermIndex, cacmQueryTermIndex);
+									"bm25", cacmDocTermIndex, cacmQueryTermIndex, bmVerbosity,
+									outVerbose, cacmQueryWeights);
 							System.out.println("CACM BM25 MAP is " + bmCacmResult
 									+ " for " + bmNumberVal + " documents");
+							if (bmVerbosity.equals("verbose")) {
+								outVerbose.println("CACM BM25 MAP is " + bmCacmResult
+										+ " for " + bmNumberVal + " documents");
+							}
 						} 
 						if (collection.equals("med") || collection.equals("all")) {
 							if (medDocTermIndex == null) {
@@ -129,20 +155,28 @@ public class EvaluateQueriesMini {
 								medQueryTermIndex = SimilarityMini.
 										loadTokenizedQueries(medQueryFile);
 							}
+							HashMap<Integer, HashMap<String, TreeMap<String, Double>>> medQueryWeights = 
+									new HashMap<Integer, HashMap<String, TreeMap<String, Double>>>();
 							bmMedResult = evaluateMap(indexPath, medDocsDir, medQueryFile, 
 									medAnswerFile, bmNumberVal, medIndexName, stopwords,
-									"bm25", medDocTermIndex, medQueryTermIndex);
+									"bm25", medDocTermIndex, medQueryTermIndex, bmVerbosity,
+									outVerbose, medQueryWeights);
 							System.out.println("MED BM25 MAP is " + bmMedResult
-									+ "for " + bmNumberVal + " documents");
+									+ " for " + bmNumberVal + " documents");
+							if (bmVerbosity.equals("verbose")) {
+								outVerbose.println("MED BM25 MAP is " + bmMedResult
+										+ " for " + bmNumberVal + " documents");
+							}
 						} 
 						if (!(collection.equals("cacm") || collection.equals("med") 
 								|| collection.equals("all"))) {
 							System.out.println("Invalid arguments supplied for bm25");
 						}
-						argsPosition += 2;
+						argsPosition += 3;
 						break;
 					case "tfidf":
 						String numberStr = args[argsPosition + 2];
+						String verboseStr = args[argsPosition + 3];
 						int numberVal = 0;
 						switch (numberStr) {
 						case "total":
@@ -161,10 +195,10 @@ public class EvaluateQueriesMini {
 						switch (tfidfType) {
 						case "atcatc":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartACACM(numberVal);
+								SimilarityMini.printMapPartACACM(numberVal, verboseStr, outVerbose);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartAMed(numberVal);
+								SimilarityMini.printMapPartAMed(numberVal, verboseStr, outVerbose);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -173,10 +207,10 @@ public class EvaluateQueriesMini {
 							break;
 						case "atnatn":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartBCACM(numberVal);
+								SimilarityMini.printMapPartBCACM(numberVal, verboseStr, outVerbose);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartBMed(numberVal);
+								SimilarityMini.printMapPartBMed(numberVal, verboseStr, outVerbose);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -185,10 +219,10 @@ public class EvaluateQueriesMini {
 							break;
 						case "annbpn":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartCCACM(numberVal);
+								SimilarityMini.printMapPartCCACM(numberVal, verboseStr, outVerbose);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartCMed(numberVal);
+								SimilarityMini.printMapPartCMed(numberVal, verboseStr, outVerbose);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -197,10 +231,10 @@ public class EvaluateQueriesMini {
 							break;
 						case "custom":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartDCACM(numberVal);
+								SimilarityMini.printMapPartDCACM(numberVal, verboseStr, outVerbose);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartDMed(numberVal);
+								SimilarityMini.printMapPartDMed(numberVal, verboseStr, outVerbose);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -209,16 +243,16 @@ public class EvaluateQueriesMini {
 							break;
 						case "all":
 							if (collection.equals("cacm") || collection.equals("all")) {
-								SimilarityMini.printMapPartACACM(numberVal);
-								SimilarityMini.printMapPartBCACM(numberVal);
-								SimilarityMini.printMapPartCCACM(numberVal);
-								SimilarityMini.printMapPartDCACM(numberVal);
+								SimilarityMini.printMapPartACACM(numberVal, verboseStr, outVerbose);
+								SimilarityMini.printMapPartBCACM(numberVal, verboseStr, outVerbose);
+								SimilarityMini.printMapPartCCACM(numberVal, verboseStr, outVerbose);
+								SimilarityMini.printMapPartDCACM(numberVal, verboseStr, outVerbose);
 							} 
 							if (collection.equals("med") || collection.equals("all")) {
-								SimilarityMini.printMapPartAMed(numberVal);
-								SimilarityMini.printMapPartBMed(numberVal);
-								SimilarityMini.printMapPartCMed(numberVal);
-								SimilarityMini.printMapPartDMed(numberVal);
+								SimilarityMini.printMapPartAMed(numberVal, verboseStr, outVerbose);
+								SimilarityMini.printMapPartBMed(numberVal, verboseStr, outVerbose);
+								SimilarityMini.printMapPartCMed(numberVal, verboseStr, outVerbose);
+								SimilarityMini.printMapPartDMed(numberVal, verboseStr, outVerbose);
 							} 
 							if (!(collection.equals("cacm") || collection.equals("med") 
 									|| collection.equals("all"))) {
@@ -226,7 +260,7 @@ public class EvaluateQueriesMini {
 							}
 							break;
 						}
-						argsPosition += 3;
+						argsPosition += 4;
 						break;
 						
 					default:
@@ -242,6 +276,9 @@ public class EvaluateQueriesMini {
 		} else {
 			System.out.println("Invalid argument configuration supplied");
 		}
+
+		outVerbose.close();
+
 	}
 
 	/**
@@ -329,7 +366,9 @@ public class EvaluateQueriesMini {
 			String indexName, CharArraySet stopwords,
 			String similarityMeasure, 
 			HashMap<String, HashMap<String, Integer>> docTermIndex,
-			HashMap<Integer, TreeMap<String, Integer>> queryTermIndex) {
+			HashMap<Integer, TreeMap<String, Integer>> queryTermIndex,
+			String verbosity, PrintWriter verboseFile, 
+			HashMap<Integer, HashMap<String, TreeMap<String, Double>>> queryWeights) {
 
 
 		// load queries and answer
@@ -340,13 +379,14 @@ public class EvaluateQueriesMini {
 		HashMap<Integer, TreeSet<Pair>> bm25results = null;
 		// load results
 		if (similarityMeasure == "bm25") {
-			bm25results = SimilarityMini.calculateBM25(docTermIndex, queryTermIndex);	
+			bm25results = SimilarityMini.calculateBM25(docTermIndex, queryTermIndex, queryWeights);	
 		}
 		
 		
 
 		// Search and evaluate
 		double sum = 0;
+		double currPrecision = 0.;
 		for (Integer i : queries.keySet()) {
 			if (similarityMeasure == "bm25") {
 				results = SimilarityMini.extractDocList(bm25results, i);
@@ -356,9 +396,43 @@ public class EvaluateQueriesMini {
 				} catch (IndexOutOfBoundsException e) {
 				}
 			}
-			sum += mapPrecision(queryAnswers.get(i), results);
+			HashSet<String> currAnswers = queryAnswers.get(i);
+			currPrecision = mapPrecision(currAnswers, results);
+			if (verbosity.equals("verbose")) {
+				if (queryFile.contains("cacm")) {
+					verboseFile.println("CACM Query " + i + " with AP=" + currPrecision);
+				} else {
+					verboseFile.println("MED Query " + i + " with AP=" + currPrecision);
+				}
+				ArrayList<String> retDocs = new ArrayList<String>();
+				ArrayList<String> nonRetDocs = new ArrayList<String>();
+				for (String doc : currAnswers) {
+					if (results.contains(doc)) {
+						int index = results.indexOf(doc);
+						String fullDoc = doc + " at " + index;
+						retDocs.add(fullDoc);
+					} else {
+						nonRetDocs.add(doc);
+					}
+				}
+				verboseFile.println("Relevant documents retrieved: " + retDocs);
+				verboseFile.println("Relevant documents not retrieved: " + nonRetDocs);
+				verboseFile.println(retDocs.size() + " of " + currAnswers.size() 
+						+ " relevant docs retrieved");
+			}
+			sum += currPrecision;
 		}
-		System.out.println(sum + ", " + queries.size());
+		if (verbosity.equals("verbose")) {
+			for (Integer i : queries.keySet()) {
+				if (queryFile.contains("cacm")) {
+					verboseFile.println("CACM Query " + i);
+				} else {
+					verboseFile.println("MED Query " + i);
+				}
+				HashMap<String, TreeMap<String, Double>> docWeights = queryWeights.get(i);
+				verboseFile.println("Term weights: " + docWeights);
+			}
+		}
 		return sum / queries.size();
 	}
 	

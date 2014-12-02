@@ -26,5 +26,9 @@ public class Pair implements Comparable<Pair> {
 		}
 		return 0;
 	}
+	@Override
+	public String toString() {
+		return this.getId() + "=" + this.getVal();
+	}
 	
 }
