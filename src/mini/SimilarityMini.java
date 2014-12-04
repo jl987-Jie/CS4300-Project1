@@ -354,12 +354,12 @@ public class SimilarityMini {
 		matchedDocumentCount++;
 		precisionList.add((double)matchedDocumentCount / totalDocumentSoFar);
 	  }
-	  if (verbosity.equals("verbose")) {
+	  if ("verbose".equals(verbosity)) {
 		resultsDocIds.add(result.getId());
 	  }
 	}
 	
-	if (verbosity.equals("verbose")) {
+	if ("verbose".equals(verbosity)) {
 	  ArrayList<String> retDocs = new ArrayList<String>();
 	  ArrayList<String> nonRetDocs = new ArrayList<String>();
 	  for (String doc : answers) {

@@ -33,30 +33,14 @@ is not in a cluster, its similarity does not change.
 public class Cluster {
 
 	public static void main(String[] args) {
-		SimilarityMini.init();
-		initCacmMap();
-		ArrayList<ClusterObj> clusterList = cluster(1, 20);
-		Pair newRankedDoc[] = new Pair[30];
-		int idx = 0;
-		int clusterId = 1;
-		for (ClusterObj clusterObj : clusterList) {
-			System.out.println("Cluster " + clusterId + ": ...");
-			for (Pair p : clusterObj.getItems()) {
-				System.out.println(p);
-				newRankedDoc[idx] = p;
-				idx++;
-			}
-			clusterId++;
-		}
-		//		Arrays.sort(newRankedDoc);
+		//		SimilarityMini.init();
+		//		initCacmMap();
+		//
+		//		printMapScore(100, 20);
 
-		//		double test[] = SimilarityMini.getRelevance("CACM-0001", -1, null, null);
-		//		for (int i = 0; i < test.length; i++) {
-		//			System.out.println(test[i]);
-		//		}
-
-		//		SimilarityMini.initMed();
-		//		initMedMap();
+		SimilarityMini.initMed();
+		initMedMap();
+		printMapScoreMed(100, 20);
 	}
 
 	// <queryId, Pair[]> where Pair[] is a sorted 100 top documents using atc.atc (CACM)
@@ -90,15 +74,20 @@ public class Cluster {
 	 * @param queryId
 	 * @return
 	 */
-	public static ArrayList<ClusterObj> cluster(int queryId, int K) {
-		Pair pArray[] = cacmTop100DocMap.get(queryId); // returns a list of documents ranked by score.
+	public static ArrayList<ClusterObj> cluster(int queryId, int K, String type) {
+		Pair pArray[];
+
+		if ("med".equals(type)) {
+			pArray = medTop100DocMap.get(queryId);
+		} else {
+			pArray = cacmTop100DocMap.get(queryId); // returns a list of documents ranked by score.
+		}
 		// consider only top 30.
 		ArrayList<ClusterObj> clusters = new ArrayList<ClusterObj>();
 		for (int i = 0; i < 30; i++) {
 			Pair p = new Pair(); // doc, value of similarity to query, weight vector
 			p.setId(pArray[i].getId());
 			p.setVal(pArray[i].getVal());
-			System.out.println(p.getId() + ", " + p.getVal());
 			p.setValArray(SimilarityMini.getRelevance(pArray[i].getId(), -1, null, null));
 			ArrayList<Pair> list = new ArrayList<Pair>();
 			list.add(p);
@@ -125,7 +114,7 @@ public class Cluster {
 				}
 			}
 			// combine the two clusters.
-			System.out.println("Combining clusters " + clusterOneIdx + ", " + clusterTwoIdx + ": " + minDist);
+			//			System.out.println("Combining clusters " + clusterOneIdx + ", " + clusterTwoIdx + ": " + minDist);
 			ClusterObj newCluster = new ClusterObj();
 			ArrayList<Pair> newList = new ArrayList<Pair>();
 			for (Pair p : clusters.get(clusterOneIdx).getItems()) {
@@ -152,9 +141,77 @@ public class Cluster {
 			clusters.remove(obj1);
 			clusters.remove(obj2);
 			clusters.add(newCluster);
-			System.out.println(ClusterObj.numItems(clusters));
 		}
 
 		return clusters;
 	}
+
+	public static void printMapScore(int numDocs, int clusterK) {
+
+		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
+
+		// CACM
+		int docSize = Math.min(numDocs, SimilarityMini.totalNumDocs);
+		double[] cacmMap = new double[docSize];
+
+		for (int i = 1; i <= SimilarityMini.queryMap.size(); i++) {
+			System.out.println("Performing query " + i);
+			Pair[] result = SimilarityMini.relevantDocs(i, numDocs, null, null);
+			// re-rank the result array.
+			ArrayList<ClusterObj> clusterList = cluster(i, clusterK, "cacm");
+			Pair newRankedDoc[] = new Pair[30];
+			int idx = 0;
+			for (ClusterObj clusterObj : clusterList) {
+				for (Pair p : clusterObj.getItems()) {
+					newRankedDoc[idx] = p;
+					idx++;
+				}
+			}
+			// replace the original with the new ranked scores.
+			for (int k = 0; k < 30; k++) {
+				result[k] = newRankedDoc[k];
+			}
+			cacmMap[i] = SimilarityMini.mapPrecision(answerMap.get(i), result, null, null);
+		}
+		double sum = 0.0;
+		for (int i = 0; i < cacmMap.length; i++) {
+			sum += cacmMap[i];
+		}
+		System.out.println("Question 3a atcatc CACM MAP: " + sum/SimilarityMini.queryMap.size());
+	}
+
+	// Q3A: MED
+	public static void printMapScoreMed(int numDocs, int clusterK) {
+
+		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
+
+		int docSize = Math.min(numDocs, SimilarityMini.totalNumDocs);
+		double[] medMap = new double[docSize];
+
+		for (int i = 1; i <= SimilarityMini.queryMap.size(); i++) {
+			System.out.println("Performing query " + i);
+			Pair[] result = SimilarityMini.relevantDocs(i, numDocs, null, null);
+			// re-rank the result array.
+			ArrayList<ClusterObj> clusterList = cluster(i, clusterK, "med");
+			Pair newRankedDoc[] = new Pair[30];
+			int idx = 0;
+			for (ClusterObj clusterObj : clusterList) {
+				for (Pair p : clusterObj.getItems()) {
+					newRankedDoc[idx] = p;
+					idx++;
+				}
+			}
+			// replace the original with the new ranked scores.
+			for (int k = 0; k < 30; k++) {
+				result[k] = newRankedDoc[k];
+			}
+			medMap[i] = SimilarityMini.mapPrecision(medAnswerMap.get(i), result, null, null);
+		}
+		double medsum = 0.0;
+		for (int i = 0; i < medMap.length; i++) {
+			medsum += medMap[i];
+		}
+		System.out.println("Question 3a atcatc MED MAP: " + medsum/SimilarityMini.queryMap.size());
+	}
+
 }
