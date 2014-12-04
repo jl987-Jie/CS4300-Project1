@@ -24,14 +24,25 @@ public class SimilarityMini {
   static String[] termsArray;
   static int totalNumDocs;
 
-  static HashSet<String> termSet                  = new HashSet<String>();
+  static HashSet<String> termSet = new HashSet<String>();
+  
+  // project 2: added
+  // list of terms associated with CACM document collection.
+  // They are tokenized and stopworded.
+  static HashSet<String> cacmDocTermSet = new HashSet<String>();
+  
+  // project 2: added
+  // list of terms associated with Medlars document collection.
+  // They are tokenized and stopworded.
+  static HashSet<String> medDocTermSet = new HashSet<String>();
+  
   static HashMap<String, HashMap<String, Integer>> docTermFreqMap = new HashMap<String, HashMap<String, Integer>>();
-  static HashMap<String, Integer> invDocFreqMap           = new HashMap<String, Integer>();
-  static HashMap<String, Integer> maxTfMap            = new HashMap<String, Integer>();
-  static HashMap<Integer, Integer> maxQueryTfMap          = new HashMap<Integer, Integer>();
-  static HashMap<Integer, TreeMap<String, Integer>> queryMap    = new HashMap<Integer, TreeMap<String, Integer>>();
-  static HashMap<String, HashSet<String>> idfMap          = new HashMap<String, HashSet<String>>();
-  static HashMap<Integer, HashMap<String, Double>> queryRelMap  = new HashMap<Integer, HashMap<String, Double>>();
+  static HashMap<String, Integer> invDocFreqMap = new HashMap<String, Integer>();
+  static HashMap<String, Integer> maxTfMap = new HashMap<String, Integer>();
+  static HashMap<Integer, Integer> maxQueryTfMap = new HashMap<Integer, Integer>();
+  static HashMap<Integer, TreeMap<String, Integer>> queryMap = new HashMap<Integer, TreeMap<String, Integer>>();
+  static HashMap<String, HashSet<String>> idfMap = new HashMap<String, HashSet<String>>();
+  static HashMap<Integer, HashMap<String, Double>> queryRelMap = new HashMap<Integer, HashMap<String, Double>>();
 
   //BM25 constants
   static final double B = 0.75;
@@ -40,7 +51,9 @@ public class SimilarityMini {
 
   public static void init() {
 
+	// document frequency of cacm
 	docTermFreqMap = getTermFrequency(Constants.DATA_DIR + Constants.CACM_IDX);
+	
 	queryMap = loadTokenizedQueries(Constants.CACM_QUERY);
 	idfMap = getInverseDocFreq(docTermFreqMap);
 
@@ -341,12 +354,12 @@ public class SimilarityMini {
 		matchedDocumentCount++;
 		precisionList.add((double)matchedDocumentCount / totalDocumentSoFar);
 	  }
-	  if (verbosity.equals("verbose")) {
+	  if ("verbose".equals(verbosity)) {
 		resultsDocIds.add(result.getId());
 	  }
 	}
 	
-	if (verbosity.equals("verbose")) {
+	if ("verbose".equals(verbosity)) {
 	  ArrayList<String> retDocs = new ArrayList<String>();
 	  ArrayList<String> nonRetDocs = new ArrayList<String>();
 	  for (String doc : answers) {
@@ -514,6 +527,13 @@ public class SimilarityMini {
 	return innerProd;
   }
 
+  // Construct a weight vector for a given document.
+  public static double[] getDocWeightVector(String docId) {
+	double[] weightVector = new double[termSet.size()];
+	
+	return weightVector;
+  }
+  
   /**
    * Returns a tf*idf vector for this document using atc.atc.
    * 
@@ -522,7 +542,7 @@ public class SimilarityMini {
    */
   public static double[] getRelevance(String docId, int queryId, 
 	  String verbosity, PrintWriter verboseFile) {
-
+	
 	double[] relevanceArray = new double[termSet.size()];
 	HashMap<String, Integer> thisMap = docTermFreqMap.get(docId);
 	TreeMap<String, Double> docTermWeights = new TreeMap<String, Double>();
@@ -544,12 +564,12 @@ public class SimilarityMini {
 		  score   = tfScore * idfScore;
 		}
 		relevanceArray[i] = score;
-		if (verbosity.equals("verbose")) {
+		if ("verbose".equals(verbosity)) {
 		  docTermWeights.put(term, score);
 		}
 	  }
 	}
-	if (verbosity.equals("verbose")) {
+	if ("verbose".equals(verbosity)) {
 	  verboseFile.println("Query " + queryId + ", Document " + docId + "; term weighting" + docTermWeights);
 	}
 	return relevanceArray;
@@ -631,6 +651,7 @@ public class SimilarityMini {
 	double score = 0.0;
 	for (int i = 0; i < termsArray.length; i++) {
 	  String term = termsArray[i];
+	  if (thisMap == null) System.out.println(queryId + "is null in hashmap.");
 	  if (thisMap.containsKey(term)) {
 
 		int tf    = thisMap.get(term);
@@ -646,12 +667,12 @@ public class SimilarityMini {
 		  score   = tfScore * idfScore;
 		}
 		relevanceArray[i] = score;
-		if (verbosity.equals("verbose")) {
+		if ("verbose".equals(verbosity)) {
 		  queryTermWeights.put(term, score);
 		}
 	  }
 	}
-	if (verbosity.equals("verbose")) {
+	if ("verbose".equals(verbosity)) {
 	  verboseFile.println("Query " + queryId + "; term weighting" + queryTermWeights);
 	}
 	return relevanceArray;
@@ -836,6 +857,57 @@ public class SimilarityMini {
 	return map;
   }
 
+  /**
+   * Project 2 added.
+   * Tokenize and stopword a given document.
+   * Add the terms to their respective hashset of all words.
+   * @param filename
+   * @return
+   */
+  public static HashMap<String, TreeMap<String, Integer>> loadTokenizerDocuments(String filename, String type) {
+
+	  CharArraySet stopwords = EvaluateQueriesMini.createStopwordSet(Constants.STOP_WORDS);
+	  HashMap<String, TreeMap<String, Integer>> map = new HashMap<String, TreeMap<String, Integer>>();
+	  BufferedReader in = null;
+
+	  try {
+		  in = new BufferedReader(new FileReader(new File(filename)));
+
+		  String line;
+		  while ((line = in.readLine()) != null) {
+
+			  StringReader sr   = new StringReader(line); // wrap your String
+			  BufferedReader br   = new BufferedReader(sr); // wrap your StringReader
+
+			  TokenStream tokenStr = IndexFilesMini.createTokenizer(br, stopwords);
+			  TreeMap<String, Integer> treemap = IndexFilesMini.createDictionary(tokenStr);
+			  map.put(filename, treemap);
+
+			  // adding query tokens to the entire set of tokens.
+			  if ("cacm".equals(type)) {
+				  for (String s : treemap.keySet()) {
+					  cacmDocTermSet.add(s);
+				  }
+			  } else {
+				  for (String s : treemap.keySet()) {
+					  medDocTermSet.add(s);
+				  }
+			  }
+		  }
+	  } catch (FileNotFoundException e) {
+		  System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
+	  } catch(IOException e) {
+		  System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
+	  } finally {
+		  try {
+			  in.close();
+		  } catch (IOException e) {
+			  e.printStackTrace();
+		  }
+	  }
+	  return map;
+  }
+  
   /**
    * Returns a map of integer to queries in *.query files.
    * @param filename
