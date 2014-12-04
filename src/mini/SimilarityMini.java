@@ -1019,5 +1019,313 @@ public class SimilarityMini {
 	}
 	return docList;
   }
+  
+  /**
+   * Does the Rocchio calculations
+   * 
+   * @param Constants A, B, C, K, 
+   * @param QueryID, ArrayList of relevant DocIDs, ArrayList of nonrelevant DocIDs
+   * @return double[] new query vector
+   */
+  public static double[] rocchioCalculation(double a, double b, double c, int k, 
+		  int queryId, ArrayList<String> rel, ArrayList<String> nonrel,
+		  String verbosity, PrintWriter verboseFile) {
+	  double[] qVector  = getRelevance(queryId, verbosity, verboseFile);
+	  double[] scores = new double[qVector.length];
+	  for (int i = 0; i < qVector.length; i++){
+		  qVector[i] *= a;
+		  scores[i] = 0;
+	  }
+	  for (String docId : rel) {
+		  double[] dVector  = getRelevance(docId, queryId, verbosity, verboseFile);
+		  for (int i=0; i < dVector.length; i++) {
+			  if (qVector[i] == 0) {
+				  scores[i] += b * (((double)1)/((double)rel.size())) * dVector[i];
+			  }
+			  else {
+				  qVector[i] += b * (((double)1)/((double)rel.size())) * dVector[i];
+			  }
+		  }
+	  }
+	  for (String docId : nonrel) {
+		  double[] dVector  = getRelevance(docId, queryId, verbosity, verboseFile);
+		  for (int i=0; i < dVector.length; i++) {
+			  if (qVector[i] == 0) {
+				  scores[i] -= c * (((double)1)/((double)nonrel.size())) * dVector[i];
+			  }
+			  else {
+				  qVector[i] -= c * (((double)1)/((double)nonrel.size())) * dVector[i];
+			  }
+		  }
+	  }
+	  while (k>0){
+		  int loc = -1;
+		  double max = 0.0; 
+		  for (int i = 0; i < scores.length; i++) {
+			  if (scores[i] > max) {
+				  loc = i;
+				  max = scores[i];
+			  }
+		  }
+		  if (loc == -1) {
+			  k = 0;
+		  }
+		  else {
+			  qVector[loc] = max;
+			  scores[loc] = 0;
+			  k--;
+		  }
+	  }
+	  return qVector;
+  }
+  
+  /*****************************************
+   * QUESTION 1 P2
+   * ***************************************
+   */
+  // Q1: CACM
+  public static void printMapP2CACM(int numDocs, String verbosity, PrintWriter verboseFile,
+		  double a, double b, double c, int k) {
+	init();
 
+	Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
+
+	// CACM
+	int docSize = Math.min(numDocs, totalNumDocs);
+	double[] cacmMap = new double[docSize];
+	double[] rcacmMap = new double[docSize];
+	int numGreater = 0;
+	System.out.println("P2Q1. Retrieving docs from CACM...");
+	if (verbosity.equals("verbose")) {
+	  verboseFile.println("P2Q1. CACM tfidf atcatc");
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+	  Pair[] result = relevantDocs(i, numDocs, verbosity, verboseFile);
+	  cacmMap[i] = mapPrecision(answerMap.get(i), result, verbosity, verboseFile);
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+		Pair[] tops = relevantDocs(i, 7, verbosity, verboseFile);
+		ArrayList<String> rels = new ArrayList<String>();
+		for (int j=0; j<tops.length; j++)
+			rels.add(tops[j].getId());
+		double[] rocchio = rocchioCalculation(
+				a,b,c,k,i,rels,new ArrayList<String>(),verbosity,verboseFile);
+		Pair[] result = relevantDocs(rocchio, numDocs, verbosity, verboseFile);
+		rcacmMap[i] = mapPrecision(answerMap.get(i), result, verbosity, verboseFile);
+		if (rcacmMap[i] > cacmMap[i])
+			numGreater++;
+	}
+	System.out.println("Calculating MAP for CACM tfidf atc.atc...");
+	double sum = 0.0;
+	for (int i = 0; i < rcacmMap.length; i++) {
+	  sum += rcacmMap[i];
+	  if (verbosity.equals("verbose")) {
+		verboseFile.println("P2Q1 atcatc CACM Query " + i + " with AP=" + rcacmMap[i]);
+	  }
+	}
+	System.out.println("Question 1 atcatc rCACM MAP: " + sum/queryMap.size());
+	System.out.println("Rocchio queries with better results: " + numGreater);
+	if (verbosity.equals("verbose"))  verboseFile.println("Question 3a atcatc CACM MAP: " + sum/queryMap.size());
+  }
+
+  // Q1: MED
+  public static void printMapP2Med(int numDocs, String verbosity, PrintWriter verboseFile,
+		  double a, double b, double c, int k) {
+	// MED
+
+	initMed();
+	Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
+
+	int docSize = Math.min(numDocs, totalNumDocs);
+	double[] medMap = new double[docSize];
+	double[] rmedMap = new double[docSize];
+	int numGreater = 0;
+	System.out.println("P2Q1. Retrieving docs from MED...");
+	if (verbosity.equals("verbose")) {
+	  verboseFile.println("P2Q1. MED tfidf atcatc");
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+	  Pair[] result = relevantDocs(i, numDocs, verbosity, verboseFile);
+	  medMap[i] = mapPrecision(medAnswerMap.get(i), result, verbosity, verboseFile);
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+		Pair[] tops = relevantDocs(i, 7, verbosity, verboseFile);
+		ArrayList<String> rels = new ArrayList<String>();
+		for (int j=0; j<tops.length; j++)
+			rels.add(tops[j].getId());
+		double[] rocchio = rocchioCalculation(
+				a,b,c,k,i,rels,new ArrayList<String>(),verbosity,verboseFile);
+		Pair[] result = relevantDocs(rocchio, numDocs, verbosity, verboseFile);
+		rmedMap[i] = mapPrecision(medAnswerMap.get(i), result, verbosity, verboseFile);
+		if (rmedMap[i] > medMap[i])
+			numGreater++;
+	}
+	System.out.println("Calculating MAP for MED tfidf atc.atc...");
+	double medsum = 0.0;
+	for (int i = 0; i < rmedMap.length; i++) {
+	  medsum += rmedMap[i];
+	  if (verbosity.equals("verbose")) {
+		verboseFile.println("P2Q1 atcatc MED Query " + i + " with AP=" + rmedMap[i]);
+	  }
+	}
+	System.out.println("Question 1 atcatc MED MAP: " + medsum/queryMap.size());
+	System.out.println("Rocchio queries with better results: " + numGreater);
+	if (verbosity.equals("verbose"))  verboseFile.println("Question 3a atcatc MED MAP: " + medsum/queryMap.size());
+  }
+  
+  /*****************************************
+   * QUESTION 3 P2
+   * ***************************************
+   */
+  // Q3: CACM
+  public static void printMapP2Q3CACM(int numDocs, String verbosity, PrintWriter verboseFile,
+		  double a, double b, double c, int k) {
+	init();
+
+	Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
+
+	// CACM
+	int docSize = Math.min(numDocs, totalNumDocs);
+	double[] cacmMap = new double[docSize];
+	double[] rcacmMap = new double[docSize];
+	int numGreater = 0;
+	System.out.println("P2Q1. Retrieving docs from CACM...");
+	if (verbosity.equals("verbose")) {
+	  verboseFile.println("P2Q1. CACM tfidf atcatc");
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+	  Pair[] result = relevantDocs(i, numDocs, verbosity, verboseFile);
+	  cacmMap[i] = mapPrecision(answerMap.get(i), result, verbosity, verboseFile);
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+		Pair[] tops = relevantDocs(i, 7, verbosity, verboseFile);
+		ArrayList<String> rels = new ArrayList<String>();
+		ArrayList<String> nonrels = new ArrayList<String>();
+		for (int j=0; j<tops.length; j++) {
+			if (answerMap.get(i).contains(tops[j].getId())){
+				if (rels.isEmpty())
+					rels.add(tops[j].getId());
+			}
+			else {
+				if (nonrels.isEmpty())
+					nonrels.add(tops[j].getId());
+			}
+		}
+		double[] rocchio = rocchioCalculation(
+				a,b,c,k,i,rels,new ArrayList<String>(),verbosity,verboseFile);
+		Pair[] result = relevantDocs(rocchio, numDocs, verbosity, verboseFile);
+		rcacmMap[i] = mapPrecision(answerMap.get(i), result, verbosity, verboseFile);
+		if (rcacmMap[i] > cacmMap[i])
+			numGreater++;
+	}
+	System.out.println("Calculating MAP for CACM tfidf atc.atc...");
+	double sum = 0.0;
+	for (int i = 0; i < rcacmMap.length; i++) {
+	  sum += rcacmMap[i];
+	  if (verbosity.equals("verbose")) {
+		verboseFile.println("P2Q1 atcatc CACM Query " + i + " with AP=" + rcacmMap[i]);
+	  }
+	}
+	System.out.println("Question 1 atcatc rCACM MAP: " + sum/queryMap.size());
+	System.out.println("Rocchio queries with better results: " + numGreater);
+	if (verbosity.equals("verbose"))  verboseFile.println("Question 3a atcatc CACM MAP: " + sum/queryMap.size());
+  }
+
+  // Q3: MED
+  public static void printMapP2Q3Med(int numDocs, String verbosity, PrintWriter verboseFile,
+		  double a, double b, double c, int k) {
+	// MED
+
+	initMed();
+	Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
+
+	int docSize = Math.min(numDocs, totalNumDocs);
+	double[] medMap = new double[docSize];
+	double[] rmedMap = new double[docSize];
+	int numGreater = 0;
+	System.out.println("P2Q1. Retrieving docs from MED...");
+	if (verbosity.equals("verbose")) {
+	  verboseFile.println("P2Q1. MED tfidf atcatc");
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+	  Pair[] result = relevantDocs(i, numDocs, verbosity, verboseFile);
+	  medMap[i] = mapPrecision(medAnswerMap.get(i), result, verbosity, verboseFile);
+	}
+	for (int i = 1; i <= queryMap.size(); i++) {
+		Pair[] tops = relevantDocs(i, 7, verbosity, verboseFile);
+		ArrayList<String> rels = new ArrayList<String>();
+		ArrayList<String> nonrels = new ArrayList<String>();
+		for (int j=0; j<tops.length; j++) {
+			if (medAnswerMap.get(i).contains(tops[j].getId())){
+				if (rels.isEmpty())
+					rels.add(tops[j].getId());
+			}
+			else {
+				if (nonrels.isEmpty())
+					nonrels.add(tops[j].getId());
+			}
+		}
+		double[] rocchio = rocchioCalculation(
+				a,b,c,k,i,rels,new ArrayList<String>(),verbosity,verboseFile);
+		Pair[] result = relevantDocs(rocchio, numDocs, verbosity, verboseFile);
+		rmedMap[i] = mapPrecision(medAnswerMap.get(i), result, verbosity, verboseFile);
+		if (rmedMap[i] > medMap[i])
+			numGreater++;
+	}
+	System.out.println("Calculating MAP for MED tfidf atc.atc...");
+	double medsum = 0.0;
+	for (int i = 0; i < rmedMap.length; i++) {
+	  medsum += rmedMap[i];
+	  if (verbosity.equals("verbose")) {
+		verboseFile.println("P2Q1 atcatc MED Query " + i + " with AP=" + rmedMap[i]);
+	  }
+	}
+	System.out.println("Question 1 atcatc MED MAP: " + medsum/queryMap.size());
+	System.out.println("Rocchio queries with better results: " + numGreater);
+	if (verbosity.equals("verbose"))  verboseFile.println("Question 3a atcatc MED MAP: " + medsum/queryMap.size());
+  }
+  
+  /**
+   * Returns the top numResults most relevant documents to this query.
+   * @param queryId query id.
+   * @return Pair[] with array that contains numResults such (doc, relevance score) pairs
+   */
+  public static Pair[] relevantDocs(double[] qVector, int numResults, String verbosity,
+	  PrintWriter verboseFile) {
+	Pair[] pairArray = new Pair[docTermFreqMap.size()];
+
+	int i = 0;
+	for (String docId : docTermFreqMap.keySet()) {
+	  Pair newPair = new Pair();
+	  newPair.setId(docId);
+	  newPair.setVal(relevance(docId, qVector, verbosity, verboseFile));
+	  pairArray[i] = newPair;
+	  i++;
+	}
+	Arrays.sort(pairArray);
+
+	Pair[] result = new Pair[numResults];
+	for (int j = 0; j < result.length; j++) {
+	  result[j] = pairArray[j];
+	}
+	return result;
+  }
+  
+  // Returns the relevance of document and query.
+  public static double relevance(String docId, double[] qVector, String verbosity, PrintWriter verboseFile) {
+	double[] dVector  = getRelevance(docId, -1, verbosity, verboseFile);
+	double innerProd  = UtilsMini.dotProduct(dVector, qVector);
+
+	double mag      = 0.0;
+	for (int i = 0; i < dVector.length; i++) {
+	  mag += dVector[i] * dVector[i];
+	}
+	for (int i = 0; i < qVector.length; i++) {
+	  mag += qVector[i] * qVector[i];
+	}
+
+	mag = Math.sqrt(mag);
+	if (mag == 0) return 0;
+	return innerProd / mag;
+  }
 }
