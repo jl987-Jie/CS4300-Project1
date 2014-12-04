@@ -1,5 +1,12 @@
 package project_two;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import mini.Pair;
+import mini.SimilarityMini;
+
 /** Part 2
  * 
  * @author jl987
@@ -21,6 +28,126 @@ is not in a cluster, its similarity does not change.
 public class Cluster {
 
 	public static void main(String[] args) {
+		SimilarityMini.init();
+		initCacmMap();
+		ArrayList<ClusterObj> clusterList = cluster(1, 10);
+		Pair newRankedDoc[] = new Pair[30];
+		int idx = 0;
+		int clusterId = 1;
+		for (ClusterObj clusterObj : clusterList) {
+			System.out.println("Cluster " + clusterId + ": ...");
+			for (Pair p : clusterObj.getItems()) {
+				System.out.println(p);
+				newRankedDoc[idx] = p;
+				idx++;
+			}
+			clusterId++;
+		}
+//		Arrays.sort(newRankedDoc);
 		
+//		double test[] = SimilarityMini.getRelevance("CACM-0001", -1, null, null);
+//		for (int i = 0; i < test.length; i++) {
+//			System.out.println(test[i]);
+//		}
+		
+//		SimilarityMini.initMed();
+//		initMedMap();
+	}
+	
+	// <queryId, Pair[]> where Pair[] is a sorted 100 top documents using atc.atc (CACM)
+	public static HashMap<Integer, Pair[]> cacmTop100DocMap = new HashMap<Integer, Pair[]>();
+	
+	// <queryId, Pair[]> where Pair[] is a sorted 100 top documents using atc.atc (MED)
+	public static HashMap<Integer, Pair[]> medTop100DocMap = new HashMap<Integer, Pair[]>();
+	
+	// Initialize cacmTop100DocMap (cacm queries are from 1 to 52)
+	public static void initCacmMap() {
+		for (int i = 1; i <= 52; i++) {
+			Pair pArray[] = SimilarityMini.relevantDocs(i, 100, null, null);
+			cacmTop100DocMap.put(i, pArray);
+		}
+	}
+	
+	// Initialize medTop100DocMap (med queries are from 1 to 30)
+	public static void initMedMap() {
+		for (int i = 1; i <= 30; i++) {
+			Pair pArray[] = SimilarityMini.relevantDocs(i, 100, null, null);
+			medTop100DocMap.put(i, pArray);
+		}
+	}
+	
+	/**
+	 * Cluster
+	 * 1. Find similarity between doc i and all other docs.
+	 * 2. Get the smallest similarity value (C1, C2).
+	 * 3. Cluster (C1, C2) together
+	 * 4. Repeat until K clusters left.
+	 * @param queryId
+	 * @return
+	 */
+	public static ArrayList<ClusterObj> cluster(int queryId, int K) {
+		Pair pArray[] = cacmTop100DocMap.get(queryId); // returns a list of documents ranked by score.
+		// consider only top 30.
+		ArrayList<ClusterObj> clusters = new ArrayList<ClusterObj>();
+		for (int i = 0; i < 30; i++) {
+			Pair p = new Pair(); // doc, value of similarity to query, weight vector
+			p.setId(pArray[i].getId());
+			p.setVal(pArray[i].getVal());
+			p.setValArray(SimilarityMini.getRelevance(pArray[i].getId(), -1, null, null));
+			ArrayList<Pair> list = new ArrayList<Pair>();
+			list.add(p);
+			ClusterObj clusterObj = new ClusterObj();
+			clusterObj.setItems(list);
+			clusters.add(clusterObj);
+		}
+		
+		while (clusters.size() > K) {
+//			ArrayList<ClusterObj> temp = clusters;
+			
+			double minDist = Double.MAX_VALUE;
+			int clusterOneIdx = -1;
+			int clusterTwoIdx = -1;
+			// get the two clusters with the min distance.
+			for (int i = 0; i < clusters.size(); i++) {
+				for (int j = 0; j < clusters.size(); j++) {
+					if (j != i) {
+						double sim = ClusterObj.similarity(clusters.get(i), clusters.get(j));
+						if (sim < minDist) {
+							clusterOneIdx = i;
+							clusterTwoIdx = j;
+							minDist = sim;
+						}
+					}
+				}
+			}
+			// combine the two clusters.
+			System.out.println("Combining clusters " + clusterOneIdx + ", " + clusterTwoIdx);
+			ClusterObj newCluster = new ClusterObj();
+			ArrayList<Pair> newList = new ArrayList<Pair>();
+			for (Pair p : clusters.get(clusterOneIdx).getItems()) {
+				newList.add(p);
+				newCluster.setItems(newList);
+			}
+			for (Pair p : clusters.get(clusterTwoIdx).getItems()) {
+				newCluster.getItems().add(p);
+			}
+			
+			// reranking the documents to the highest similarity to the given query.
+			double maxSimtoQuery = 0;
+			for (Pair p : newCluster.getItems()) {
+				if (p.getVal() > maxSimtoQuery) {
+					maxSimtoQuery = p.getVal();
+				}
+			}
+			for (Pair p : newCluster.getItems()) {
+				p.setVal(maxSimtoQuery);
+			}
+			
+			clusters.remove(clusterOneIdx);
+			clusters.remove(clusterTwoIdx);
+			clusters.add(newCluster);
+		}
+		
+		return clusters;
 	}
 }
