@@ -19,3 +19,8 @@ So, for example, to run on both document sets, index the documents, retrieve bas
 **NOTE:** verbose logging creates a very, very, VERY large file (at least 15 Gb for 100 documents retrieved) and should not be run unless you want to perform detailed failure analysis with the data. It outputs the term weights for each document for each query, depending on which similarity measure you use, the overall MAP values for each similarity metric, and the relevant documents retrieved and not retrieved. 
 
 **NOTE:** the tfidf evaluation is currently somewhat slow, especially for CACM; be patient when running it.
+
+PROJECT 2 UPDATE
+================
+To run the clustering algorithm, please check out ClusterMini file for implementation and Question2Clustering.java for the actual main method to execute
+the programs for k = 10, k = 20 for both CACM and Medlars collections.
