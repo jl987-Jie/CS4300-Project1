@@ -1,5 +1,6 @@
 package mini;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +11,18 @@ import mini.SimilarityMini;
 
 public class ClusterMini {
 
+	public static void main(String[] args) {
+		SimilarityMini.initMed();
+		ClusterMini.initTopDocs("med");
+		completeLinkCluster(9, 20, "med", "highest");
+		Pair[] p = medQuery.get(9);
+			NumberFormat nf = NumberFormat.getInstance();
+			nf.setMaximumFractionDigits(4);            
+			nf.setGroupingUsed(false);
+			for (int k = 0; k < 30; k++) {
+				System.out.println(p[k].getId() + "                      " + nf.format(p[k].getVal()));
+		}
+	}
 	public static HashMap<Integer, Pair[]> medQuery = new HashMap<Integer, Pair[]>();
 	public static HashMap<Integer, Pair[]> cacmQuery = new HashMap<Integer, Pair[]>();
 	
@@ -85,7 +98,9 @@ public class ClusterMini {
 			resultCluster.remove(c1);
 			resultCluster.remove(c2);
 		}
-
+//		if (queryId == 9)
+//			resultCluster.printCluster();
+		
 		int docSeenSoFar = 0;
 		// re-ranking the documents.
 		if (rerank.equals("highest")) {
