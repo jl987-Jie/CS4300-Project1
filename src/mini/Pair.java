@@ -1,7 +1,5 @@
 package mini;
 
-import java.util.Arrays;
-
 public class Pair implements Comparable<Pair> {
 
 	private String id;
@@ -34,9 +32,8 @@ public class Pair implements Comparable<Pair> {
 		double magP = UtilsMini.magnitude(p.getValArray());
 		double magQ = UtilsMini.magnitude(q.getValArray());
 		
-
 		for (int i = 0; i < p.getValArray().length; i++) {
-			dotProd += (p.getValArray()[i] / magP) * (q.getValArray()[i] / magP);
+			dotProd += (p.getValArray()[i] / magP) * (q.getValArray()[i] / magQ);
 		}
 		if (dotProd == 0) {
 			return Integer.MAX_VALUE;

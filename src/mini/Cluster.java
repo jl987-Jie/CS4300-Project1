@@ -1,8 +1,6 @@
 package mini;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,23 +10,7 @@ import mini.EvaluateQueriesMini;
 import mini.Pair;
 import mini.SimilarityMini;
 
-/** Part 2
- * 
- * @author jl987
- *
-Perform an atc.atc weighted inner-product similarity retrieval, retrieving the top 100
-documents for each query. For each query, do a complete link clustering of the top 30 (do
-not use all 100) atc weighted documents, stopping the clustering when you have reduced
-the number of clusters from 30 (initial setup) to K clusters. The distance function you
-should use is 1/dot product (this is equivalent to the inverse cosine similarity, since these
-are cosine normalized document vector).
-
-(a). Use K = 20. Re-rank the 100 documents you initially retrieved by, for each cluster
-assigning the highest similarity found in any of the documents for that cluster to all
-documents in that cluster (i.e., all documents in a cluster will be retrieved at the best
-rank of any of them, except for having to break the similarity ties). If a document
-is not in a cluster, its similarity does not change.
-
+/** Project 2
  */
 public class Cluster {
 
@@ -36,11 +18,12 @@ public class Cluster {
 		//		SimilarityMini.init();
 		//		initCacmMap();
 		//
-		//		printMapScore(100, 20);
+		//		printMapScore(100, 20, "average");
+
 
 		SimilarityMini.initMed();
 		initMedMap();
-		printMapScoreMed(100, 20);
+		printMapScoreMed(100, 10, "average");
 	}
 
 	// <queryId, Pair[]> where Pair[] is a sorted 100 top documents using atc.atc (CACM)
@@ -74,9 +57,9 @@ public class Cluster {
 	 * @param queryId
 	 * @return
 	 */
-	public static ArrayList<ClusterObj> cluster(int queryId, int K, String type) {
-		Pair pArray[];
+	public static ArrayList<ClusterObj> cluster(int queryId, int K, String type, String clusterType) {
 
+		Pair pArray[];
 		if ("med".equals(type)) {
 			pArray = medTop100DocMap.get(queryId);
 		} else {
@@ -97,7 +80,7 @@ public class Cluster {
 		}
 
 		while (clusters.size() > K) {
-			//			ArrayList<ClusterObj> temp = clusters;
+			// ArrayList<ClusterObj> temp = clusters;
 
 			double minDist = Double.MAX_VALUE;
 			int clusterOneIdx = -1;
@@ -113,8 +96,9 @@ public class Cluster {
 					}
 				}
 			}
+
 			// combine the two clusters.
-			//			System.out.println("Combining clusters " + clusterOneIdx + ", " + clusterTwoIdx + ": " + minDist);
+			// System.out.println("Combining clusters " + clusterOneIdx + ", " + clusterTwoIdx + ": " + minDist);
 			ClusterObj newCluster = new ClusterObj();
 			ArrayList<Pair> newList = new ArrayList<Pair>();
 			for (Pair p : clusters.get(clusterOneIdx).getItems()) {
@@ -126,15 +110,29 @@ public class Cluster {
 			}
 
 			// reranking the documents to the highest similarity to the given query.
-			double maxSimtoQuery = 0;
-			for (Pair p : newCluster.getItems()) {
-				if (p.getVal() > maxSimtoQuery) {
-					maxSimtoQuery = p.getVal();
+			if (clusterType.equals("highest")) {
+				double maxSimtoQuery = 0;
+				for (Pair p : newCluster.getItems()) {
+					if (p.getVal() > maxSimtoQuery) {
+						maxSimtoQuery = p.getVal();
+					}
+				}
+				for (Pair p : newCluster.getItems()) {
+					p.setVal(maxSimtoQuery);
+				}
+			} else {
+				// reranking the documents to the average similarity.
+				double totalSim = 0;
+				int count = 0;
+				for (Pair p : newCluster.getItems()) {
+					totalSim += p.getVal();
+					count++;
+				}
+				for (Pair p : newCluster.getItems()) {
+					p.setVal(totalSim / count);
 				}
 			}
-			for (Pair p : newCluster.getItems()) {
-				p.setVal(maxSimtoQuery);
-			}
+
 
 			ClusterObj obj1 = clusters.get(clusterOneIdx);
 			ClusterObj obj2 = clusters.get(clusterTwoIdx);
@@ -146,7 +144,8 @@ public class Cluster {
 		return clusters;
 	}
 
-	public static void printMapScore(int numDocs, int clusterK) {
+
+	public static void printMapScore(int numDocs, int clusterK, String clusterType) {
 
 		Map<Integer, HashSet<String>> answerMap = EvaluateQueriesMini.loadAnswers(Constants.CACM_ANSWER);
 
@@ -158,7 +157,7 @@ public class Cluster {
 			System.out.println("Performing query " + i);
 			Pair[] result = SimilarityMini.relevantDocs(i, numDocs, null, null);
 			// re-rank the result array.
-			ArrayList<ClusterObj> clusterList = cluster(i, clusterK, "cacm");
+			ArrayList<ClusterObj> clusterList = cluster(i, clusterK, "cacm", "average");
 			Pair newRankedDoc[] = new Pair[30];
 			int idx = 0;
 			for (ClusterObj clusterObj : clusterList) {
@@ -181,7 +180,7 @@ public class Cluster {
 	}
 
 	// Q3A: MED
-	public static void printMapScoreMed(int numDocs, int clusterK) {
+	public static void printMapScoreMed(int numDocs, int clusterK, String clusterType) {
 
 		Map<Integer, HashSet<String>> medAnswerMap = EvaluateQueriesMini.loadAnswers(Constants.MED_ANSWER);
 
@@ -192,7 +191,7 @@ public class Cluster {
 			System.out.println("Performing query " + i);
 			Pair[] result = SimilarityMini.relevantDocs(i, numDocs, null, null);
 			// re-rank the result array.
-			ArrayList<ClusterObj> clusterList = cluster(i, clusterK, "med");
+			ArrayList<ClusterObj> clusterList = cluster(i, clusterK, "med", "average");
 			Pair newRankedDoc[] = new Pair[30];
 			int idx = 0;
 			for (ClusterObj clusterObj : clusterList) {

@@ -8,6 +8,10 @@ public class ClusterObj {
 
 	private ArrayList<Pair> items;
 	
+	public ClusterObj() {
+		items = new ArrayList<Pair>();
+	}
+	
 	public ArrayList<Pair> getItems() {
 		return items;
 	}
