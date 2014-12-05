@@ -101,6 +101,7 @@ public class ClusterMini {
 				for (Pair doc : clusterObj.getItems()) {
 					doc.setVal(maxRelScore);
 					top30Docs[docSeenSoFar] = doc;
+					docSeenSoFar += 1; // (forgot to increment this earlier!)
 				}
 				
 				// update the rankings in the original list of relevant documents for this query.
@@ -137,6 +138,7 @@ public class ClusterMini {
 				for (Pair doc : clusterObj.getItems()) {
 					doc.setVal(totalRelScore / totalDocs);
 					top30Docs[docSeenSoFar] = doc;
+					docSeenSoFar += 1;
 				}
 				
 				// update the rankings in the original list of relevant documents for this query.
