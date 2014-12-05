@@ -262,6 +262,61 @@ public class EvaluateQueriesMini {
 						}
 						argsPosition += 4;
 						break;
+					
+					case "rocchio":
+						String rnumberStr = args[argsPosition + 2];
+						String rverboseStr = args[argsPosition + 3];
+						int rnumberVal = 0;
+						double a = 0.0;
+						double b = 0.0;
+						double c = 0.0;
+						int k = 0;
+						switch (rnumberStr) {
+						case "total":
+							rnumberVal = Integer.MAX_VALUE;
+							break;
+						default:
+							try {
+								rnumberVal = Integer.parseInt(rnumberStr);
+								a = Double.parseDouble(args[argsPosition+4]);
+								b = Double.parseDouble(args[argsPosition+5]);
+								c = Double.parseDouble(args[argsPosition+6]);
+								k = Integer.parseInt(args[argsPosition+7]);
+							} catch (NumberFormatException e){
+								System.out.println("Invalid argument supplied for rocchio");
+								break;
+							}
+							break;
+						}
+						String rocchio = args[argsPosition+1];
+						switch (rocchio) {
+						case "pr":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapP2CACM(rnumberVal, rverboseStr, outVerbose, a, b, c, k);
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapP2Med(rnumberVal, rverboseStr, outVerbose, a, b, c, k);
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
+							break;
+						case "r":
+							if (collection.equals("cacm") || collection.equals("all")) {
+								SimilarityMini.printMapP2Q3CACM(rnumberVal, rverboseStr, outVerbose, a, b, c, k);
+							} 
+							if (collection.equals("med") || collection.equals("all")) {
+								SimilarityMini.printMapP2Q3Med(rnumberVal, rverboseStr, outVerbose, a, b, c, k);
+							} 
+							if (!(collection.equals("cacm") || collection.equals("med") 
+									|| collection.equals("all"))) {
+								System.out.println("Invalid arguments supplied for tfidf");
+							}
+							break;
+						}
+						argsPosition += 8;
+						break;
 						
 					default:
 						System.out.println("Invalid arguments supplied to main");
