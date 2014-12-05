@@ -1,6 +1,7 @@
 package mini;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import mini.ClusterObj;
@@ -109,6 +110,7 @@ public class ClusterMini {
 						for (int j = 0; j < 30; j++) {
 							relDocs[j] = top30Docs[j]; // update the top 30 documents
 						}
+						Arrays.sort(relDocs);
 						medQuery.put(queryId, relDocs); // put back into map.
 					}
 				} else if (collectionName.equals("cacm")) {
@@ -117,6 +119,7 @@ public class ClusterMini {
 						for (int j = 0; j < 30; j++) {
 							relDocs[j] = top30Docs[j];
 						}
+						Arrays.sort(relDocs);
 						cacmQuery.put(queryId, relDocs);
 					}
 				}
@@ -143,6 +146,7 @@ public class ClusterMini {
 						for (int j = 0; j < 30; j++) {
 							relDocs[j] = top30Docs[j]; // update the top 30 documents
 						}
+						Arrays.sort(relDocs);
 						medQuery.put(queryId, relDocs); // put back into map.
 					}
 				} else if (collectionName.equals("cacm")) {
@@ -151,6 +155,7 @@ public class ClusterMini {
 						for (int j = 0; j < 30; j++) {
 							relDocs[j] = top30Docs[j];
 						}
+						Arrays.sort(relDocs);
 						cacmQuery.put(queryId, relDocs);
 					}
 				}

@@ -26,9 +26,9 @@ public class ClusterObj {
 		for (Pair item : c1.getItems()) {
 			for (Pair otherItem : c2.getItems()) {
 				double sim = Pair.distFunction(item, otherItem);
-				if (sim > maxSim) {
+				
+				if (sim > maxSim)
 					maxSim = sim;
-				}
 			}
 		}
 		return maxSim;

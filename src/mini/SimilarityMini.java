@@ -89,7 +89,11 @@ public class SimilarityMini {
 	totalNumDocs = docTermFreqMap.size();
 
   }
-
+  
+  public static void main(String[] args) {
+	  printMapPartACACM(100, "null", null);
+  }
+  
   /*****************************************
    * QUESTION 3 PART A
    * ***************************************

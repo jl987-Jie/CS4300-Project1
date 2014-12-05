@@ -28,17 +28,21 @@ public class Pair implements Comparable<Pair> {
 	// Project 2: distance function: 1 / dot product.
 	public static double distFunction(Pair p, Pair q) {
 	
-		double dotProd = 0;
-		double magP = UtilsMini.magnitude(p.getValArray());
-		double magQ = UtilsMini.magnitude(q.getValArray());
-		
-		for (int i = 0; i < p.getValArray().length; i++) {
-			dotProd += (p.getValArray()[i] / magP) * (q.getValArray()[i] / magQ);
+//		double dotProd = 0;
+//		double magP = UtilsMini.magnitude(p.getValArray());
+//		double magQ = UtilsMini.magnitude(q.getValArray());
+//		
+//		for (int i = 0; i < p.getValArray().length; i++) {
+//			dotProd += (p.getValArray()[i] / magP) * (q.getValArray()[i] / magQ);
+//		}
+//		if (dotProd == 0) {
+//			return Integer.MAX_VALUE;
+//		}
+		double sim = UtilsMini.cosineNormalization(p.getValArray(), q.getValArray());
+		if (sim == 0) {
+			return Double.MAX_VALUE;
 		}
-		if (dotProd == 0) {
-			return Integer.MAX_VALUE;
-		}
-		return 1.0 / dotProd;
+		return 1.0 / sim;
 	}
 	
 	@Override

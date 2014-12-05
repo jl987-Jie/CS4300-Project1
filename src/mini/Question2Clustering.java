@@ -11,7 +11,7 @@ import mini.SimilarityMini;
 // Print out of question 2 MAP values
 public class Question2Clustering {
 	public static void main(String[] args) {
-		printCacmMapK20();
+		printMedMapK20();
 	}
 	
 	// CACM MAP k = 10. (average)
